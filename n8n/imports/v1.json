@@ -1,0 +1,6063 @@
+{
+  "name": "v1",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "id": "41a0b37f-9a33-4e6b-96b3-afe4a8a12b3e",
+      "name": "WhatsApp Trigger",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "position": [
+        -2272,
+        16
+      ],
+      "webhookId": "d3978cae-2aca-4553-8ac7-ab89068deabc",
+      "typeVersion": 1,
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "CzwOvZWfntQONT9I",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c53cd9f9-77c1-4331-98ff-bfc9bdf95a3c",
+              "name": "text",
+              "type": "string",
+              "value": "={{ $('WhatsApp Trigger').item.json.messages[0].text.body }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c30b0437-dd08-44ba-b055-92d74a1a23bc",
+      "name": "Text",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1568,
+        0
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "version": 2,
+                  "leftValue": "",
+                  "caseSensitive": true,
+                  "typeValidation": "strict"
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "08fd0c80-307e-4f45-b1de-35192ee4ec5e",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "leftValue": "={{ $json.messages[0].text.body }}",
+                    "rightValue": ""
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "6fb34592-d297-424a-b716-8450b0ceae3e",
+      "name": "Input type",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        -2016,
+        16
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"is_language\": true,\n  \"language_english_name\": \"Malay\",\n  \"next_question\": \"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1232,
+        624
+      ],
+      "id": "a4b281a5-6565-4c66-8d3a-ae6cad7822c2",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.is_language }}",
+                    "rightValue": false,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "2ab11766-2278-4640-93ab-bff2ba8e9cc5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "false"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7a3a7384-e664-41b2-a2d8-ca6d34f58467",
+                    "leftValue": "={{ $json.output.is_language }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1024,
+        432
+      ],
+      "id": "b11bdfe9-77b1-4c55-992a-3c0e372aee2c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.next_question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -784,
+        320
+      ],
+      "id": "255bcbdb-6d81-42a7-8d7b-06537465f633",
+      "name": "Ask_Language",
+      "webhookId": "084385fd-3c26-4abb-b328-341fdd9cffa1",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "39067ed2-bec4-4736-a1b0-fc7cf9f92620",
+              "leftValue": "={{ $('language_is_null').item.json.language_is_null }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -576,
+        592
+      ],
+      "id": "2f686f30-2bf3-42d6-8054-3b021a3fff49",
+      "name": "is_First_Session"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.translated_text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        576
+      ],
+      "id": "99f6d306-265d-4f76-b95d-79747c6a192d",
+      "name": "Send_Welcome",
+      "webhookId": "084385fd-3c26-4abb-b328-341fdd9cffa1",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "kamekichi128/qwen3-4b-instruct-2507:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        752
+      ],
+      "id": "1ace8ee7-aa49-47bd-8315-1c541057aa8d",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "1l7PH0fvrNXIemWO",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Text').item.json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“语言名称识别助手”。\n\n你的任务：判断用户最新输入是否**明确表达了希望使用某一种支持语言**。\n注意：\n1. 不是判断这段输入用了什么语言。\n2. 不是只接受纯语言名称。\n3. 只要用户明确表达想使用某一种支持语言，就算合法。\n\n你只支持识别这 4 种语言：\n\n1. Chinese\n可识别为该语言的输入关键词：中文、汉语、普通话、华语、Chinese、Mandarin、简体中文、繁体中文\n\n2. English\n可识别为该语言的输入关键词：英文、英语、English\n\n3. Japanese\n可识别为该语言的输入关键词：日文、日语、Japanese、日本語\n\n4. Thai\n可识别为该语言的输入关键词：泰语、Thai、ภาษาไทย\n\n请严格按下面规则执行：\n\n1. 先去掉首尾空格。\n2. 英文字母不区分大小写。\n3. 如果用户输入中**明确出现且只出现一种**支持语言，并且表达的是“选择、指定、希望使用”该语言，则返回 is_language=true。\n4. 如果用户输入本身就是某个支持语言名称，也返回 is_language=true。\n5. 可以接受带少量功能词、礼貌词、请求词的表达，只要意思仍然是明确选择一种支持语言。\n   例如：我想用中文、请用English、日语，谢谢、Thai please、中文吧 都算 true。\n6. 不要因为输入内容看起来像某种语言，就判断它是语言选择。\n   例如：你好、hello、こんにちは、สวัสดี 都不是在选择语言，必须返回 false。\n7. 如果没有明确表达要使用哪一种支持语言，返回 false。\n   例如：随便、都行、你决定、帮我继续、可以开始了，都返回 false。\n8. 如果同时出现多种语言，或无法确定是单一明确选择，返回 false。\n   例如：中文或英文都可以、中英都行、日本語 and English、泰语还是中文？都返回 false。\n9. 如果输入是其他语言名称（如：Malay、西班牙语、German），返回 false。\n10. 无法确定时，一律返回 false。\n\n你必须只输出一个 JSON 对象，不要输出任何解释、不要输出 Markdown、不要输出代码块。\n\nJSON 格式固定为：\n\n{\n  \"is_language\": true,\n  \"language_english_name\": \"string\",\n  \"next_question\": \"string\"\n}\n\n字段规则：\n\n- is_language：\n  - 当用户明确表达希望使用某一种支持语言时，返回 true\n  - 其他情况全部返回 false\n\n- language_english_name：\n  - 当 is_language=true 时，只能是 \"Chinese\" / \"English\" / \"Japanese\" / \"Thai\"\n  - 当 is_language=false 时，必须是 \"\"\n\n- next_question：\n  - 当 is_language=true 时，必须是 \"\"\n  - 当 is_language=false 时，必须是：\n    \"Which language would you like to use for the upcoming service? We support 中文、English、日本語、ภาษาไทย.\"\n\n示例：\n\n- 输入：中文\n  输出：{\"is_language\":true,\"language_english_name\":\"Chinese\",\"next_question\":\"\"}\n\n- 输入：我想用中文\n  输出：{\"is_language\":true,\"language_english_name\":\"Chinese\",\"next_question\":\"\"}\n\n- 输入：English please\n  输出：{\"is_language\":true,\"language_english_name\":\"English\",\"next_question\":\"\"}\n\n- 输入：日语，谢谢\n  输出：{\"is_language\":true,\"language_english_name\":\"Japanese\",\"next_question\":\"\"}\n\n- 输入：你好\n  输出：{\"is_language\":false,\"language_english_name\":\"\",\"next_question\":\"Which language would you like to use for the upcoming service? We support 中文、English、日本語、ภาษาไทย.\"}\n\n- 输入：中英都可以\n  输出：{\"is_language\":false,\"language_english_name\":\"\",\"next_question\":\"You need to explicitly specify a language. We support 中文、English、日本語、ภาษาไทย.\"}\n\n- 输入：Malay\n  输出：{\"is_language\":false,\"language_english_name\":\"\",\"next_question\":\"Which language would you like to use for the upcoming service? We support 中文、English、日本語、ภาษาไทย.\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1376,
+        432
+      ],
+      "id": "00d7879a-3c10-43f2-9e1e-4ee3be96abc9",
+      "name": "Language Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Language Agent').item.json.output.language_english_name }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“欢迎语翻译助手”。\n\n你的任务是：根据用户提供的“语言名称”，将下面这句固定欢迎语翻译成对应语言，并只输出一个 JSON 对象。\n\n固定欢迎语：\n欢迎使用 Topcon 维修信息收集系统，系统正在启动，请稍候。\n\n请严格遵守以下规则：\n\n1. 用户会提供一个语言名称，可能是以下四种之一：\n   - Chinese\n   - English\n   - Japanese\n   - Thai\n\n2. 你需要根据语言名称，将固定欢迎语翻译成对应语言。\n\n3. 如果语言名称合法且支持：\n   - 返回 welcome = true\n   - 返回对应语言的翻译结果\n\n4. 如果语言名称不合法、为空、或不在支持范围内：\n   - 返回 welcome = false\n   - translated_text 返回空字符串 \"\"\n\n5. 不要输出解释说明。\n6. 不要输出 Markdown。\n7. 不要输出代码块。\n8. 不要输出 JSON 以外的任何内容。\n\nJSON 格式固定为：\n\n{\n  \"welcome\": true,\n  \"translated_text\": \"string\"\n}\n\n字段规则：\n\n- welcome\n  - 类型：boolean\n  - 当语言名称合法且支持时，返回 true\n  - 否则返回 false\n\n- translated_text\n  - 类型：string\n  - 当 welcome = true 时，返回翻译后的欢迎语\n  - 当 welcome = false 时，返回空字符串 \"\"\n\n翻译要求：\n\n1. Chinese：\n   欢迎使用 Topcon 维修信息收集系统，系统正在启动，请稍候。\n\n2. English：\n   Welcome to the Topcon Repair Information Collection System. The system is starting up. Please wait a moment.\n\n3. Japanese：\n   Topcon修理情報収集システムへようこそ。システムを起動中です。しばらくお待ちください。\n\n4. Thai：\n   ยินดีต้อนรับสู่ระบบรวบรวมข้อมูลการซ่อมบำรุงของ Topcon ขณะนี้ระบบกำลังเริ่มต้น กรุณารอสักครู่\n\n示例：\n\n- 输入：English\n  输出：\n  {\"welcome\":true,\"translated_text\":\"Welcome to the Topcon Repair Information Collection System. The system is starting up. Please wait a moment.\"}\n\n- 输入：Japanese\n  输出：\n  {\"welcome\":true,\"translated_text\":\"Topcon修理情報収集システムへようこそ。システムを起動中です。しばらくお待ちください。\"}\n\n- 输入：Malay\n  输出：\n  {\"welcome\":false,\"translated_text\":\"\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -368,
+        576
+      ],
+      "id": "227decdc-28e6-4019-b100-382a79e78d90",
+      "name": "Welcome Agent"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"welcome\": true,\n  \"translated_text\": \"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        752
+      ],
+      "id": "b37e49de-3cd5-4f02-82d3-f06b79f2682a",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_chat_histories",
+          "mode": "list",
+          "cachedResultName": "n8n_chat_histories"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        704,
+        4400
+      ],
+      "id": "c530866f-902b-4369-8728-ab92d0ccc095",
+      "name": "Reset Chat Histories",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.current_agent_index }}",
+                    "rightValue": 1,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    },
+                    "id": "b86797b7-51d5-476c-b6c6-26a48793c22b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "46952c4a-4409-4bfd-a845-3343d87f8a76",
+                    "leftValue": "={{ $json.current_agent_index }}",
+                    "rightValue": 2,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "2"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "70c4a68c-a234-4fe1-af34-67a8aad79298",
+                    "leftValue": "={{ $json.current_agent_index }}",
+                    "rightValue": 3,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "3"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d068fca7-6d30-47aa-8c52-1d471d290e17",
+                    "leftValue": "={{ $json.current_agent_index }}",
+                    "rightValue": 4,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "4"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bbba39a2-f33e-44f9-8d40-5cdfcbe9c12d",
+                    "leftValue": "={{ $json.current_agent_index }}",
+                    "rightValue": 5,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "5"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cd7e266f-2ae8-42fe-937f-15b35f65515c",
+                    "leftValue": "={{ $json.current_agent_index }}",
+                    "rightValue": 6,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "6"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0a3bc93c-dd83-4925-973f-b29281335eb0",
+                    "leftValue": "={{ $json.current_agent_index }}",
+                    "rightValue": 7,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "7"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "de59333d-53cd-4c9a-8cc6-666e08e9730a",
+                    "leftValue": "={{ $json.current_agent_index }}",
+                    "rightValue": 8,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "8"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f885046c-93e2-4d13-b9d3-1c55796aee49",
+                    "leftValue": "={{ $json.current_agent_index }}",
+                    "rightValue": 9,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "9"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1376,
+        1040
+      ],
+      "id": "a5e830a5-e5d8-4f9b-8991-7edd0cdda08c",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=指定的回复语言：{{ $('Select Agent ID & Language').item.json.language }}；用户消息：{{ $('Text').item.json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“客户信息采集子助手-1”，你只负责收集一个字段：customer_name（客户名称）。\n\n你的任务：\n根据 memory 中已有的 customer_name，以及用户最新一条消息，判断 customer_name 是否已经完整。字段为空则提问。\n\n你只处理这个字段，不处理其他字段。\n即使用户消息里出现了其他信息，也只提取 customer_name 相关内容。\n\n判断规则：\n1. complete：\n   - 有明确的客户名称/公司名称/机构名称，且可以直接使用。\n   - 例如：Topcon Malaysia、ABC 医院、新城眼科诊所。\n2. partial：\n   - 有信息但不够清楚，或表达模糊。\n   - 例如：我们公司、客户那边、医院、门店。\n   - 如果用户新说的名称与 memory 中旧名称不一致，也按 partial 处理，并提出澄清问题。\n3. missing：\n   - 完全没有可用的客户名称信息。\n\n提问规则：\n1. 如果是 missing：\n   - 提问：请问客户名称是？\n2. 如果是 partial：\n   - 只追问缺失或冲突的部分，不要重复问完整信息。\n3. 如果是 complete：\n   - 不提问，question 必须为 \"\"。\n\nnext_field_index 规则：\n1. 如果 customer_name 是 complete，next_field_index = 2\n2. 如果 customer_name 是 missing 或 partial，next_field_index = 1\n\n输出要求：\n1. 你必须只输出一个 JSON 对象\n2. 不要输出解释\n3. 不要输出 Markdown\n4. 不要输出 JSON 以外的任何内容\n5. question需要使用指定语言\n\nJSON 格式固定为：\n{\n  \"agent_index\": 1,\n  \"field_name\": \"customer_name\",\n  \"field_status\": \"missing\",\n  \"field_value\": \"\",\n  \"question\": \"\",\n  \"next_field_index\": 1\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1040,
+        1024
+      ],
+      "id": "3cb19aca-70d4-41f3-8465-05866be9fcdd",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=指定的回复语言：{{ $('Select Agent ID & Language').item.json.language }}；当前时间：{{ $json.currentDate }}；用户提供的时间：{{ $('AI Agent12').item.json.output.normalized_datetime }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“客户信息采集子助手-2”，你只负责收集一个字段：appointment_start（开始日期时间）。\n\n你的任务：\n根据 memory 中已有的 appointment_start，以及用户最新一条消息，判断 appointment_start 是否已经完整。字段为空则提问。\n\n你只处理这个字段，不处理其他字段。\n即使用户消息里出现了其他信息，也只提取 appointment_start 相关内容。\n\n对于日期如3.5可被理解为三月五日\n\n判断规则：\n1. complete：\n   - 同时有日期和时间，且含义清楚，可以直接用于预约。\n   - 例如：2026-03-10 09:30、3月10日上午9点半。\n2. partial：\n   - 只有日期，没有时间。\n   - 只有时间，没有日期。\n   - 时间范围不清楚或表达冲突。\n3. missing：\n   - 完全没有可用信息。\n\n提问规则：\n1. 如果只有日期没有时间，只问时间。\n2. 如果只有时间没有日期，只问日期。\n3. 如果信息冲突，提出一个澄清问题。\n4. 每次只能问一个问题。\n5. 如果 complete，question 必须为 \"\"。\n\nnext_field_index 规则：\n1. 如果 appointment_start 是 complete，next_field_index = 3\n2. 如果 appointment_start 是 missing 或 partial，next_field_index = 2\n\n输出要求：\n1. 只输出一个 JSON 对象\n2. 不要输出解释\n3. 不要输出 JSON 以外的任何内容\n\nJSON 格式固定为：\n{\n  \"agent_index\": 2,\n  \"field_name\": \"appointment_start\",\n  \"field_status\": \"missing\",\n  \"field_value\": \"\",\n  \"question\": \"\",\n  \"next_field_index\": 2\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -16,
+        1328
+      ],
+      "id": "2f1810e8-e231-4a6a-accc-9a3cbf422c58",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=开始时间：{{ $json.appointment_start }}\n用户消息：{{ $('Text').item.json.text }}",
+        "options": {
+          "systemMessage": "你是一个“结束时间校验器”Agent，负责结合开始时间判断用户输入是否可以被解析为一个“合法、明确、可执行的结束日期时间”。\n\n你的输出必须是严格 JSON，且只能包含以下三个字段：\n{\n  \"is_datetime\": true,\n  \"question\": \"\",\n  \"normalized_datetime\": \"\"\n}\n\n字段规则：\n- is_datetime：布尔值。\n  - true：表示用户输入可以被解析为一个合法的结束日期时间，且该时间严格晚于开始时间。\n  - false：表示不可以。\n- question：字符串。\n  - 当 is_datetime = true 时，question 必须为 \"\"。\n  - 当 is_datetime = false 时，question 必须为一条自然、礼貌、像真实客服会说的话，用于请用户补充或修改结束时间信息。\n- normalized_datetime：字符串。\n  - 当 is_datetime = true 时，必须输出规范化后的结束时间，格式固定为 \"YYYY-MM-DD HH:mm\"。\n  - 当 is_datetime = false 时，必须为 \"\"。\n\n说明：\n- 开始时间 {{start_datetime}} 是已知有效时间，格式为 \"YYYY-MM-DD HH:mm\"。\n- 你的任务不是校验开始时间，而是校验“用户输入的结束时间”是否有效，并且是否严格晚于开始时间。\n\n你的判断标准如下：\n\n一、总体原则\n1. 只有当用户输入可以被解析为“唯一明确的结束时间点”，并且该时间严格晚于开始时间时，才返回：\n{\"is_datetime\": true, \"question\": \"\", \"normalized_datetime\": \"YYYY-MM-DD HH:mm\"}\n\n2. 如果无法唯一解析、缺少年/月/日/时/分中的必要信息、日期时间本身不合法、或者不晚于开始时间，则返回 false。\n\n二、关于“日期+时间”的要求\n1. 用户输入必须同时包含“日期”和“时间”。\n2. 只有日期没有时间，返回 false。\n   例如：\n   - \"2026-03-10\"\n   - \"3.10\"\n   - \"明天\"\n3. 只有时间没有日期，返回 false。\n   例如：\n   - \"15:00\"\n   - \"下午三点\"\n\n三、可接受的日期表达\n以下日期表达如果可以明确解析，应视为合法日期部分：\n1. 标准格式：\n   - 2026-03-10\n   - 2026/03/10\n   - 2026.03.10\n\n2. 简写日期格式：\n   - 3.10\n   - 3/10\n   - 3-10\n   这些都应理解为“3月10日”。\n\n3. 中文自然语言日期：\n   - 明天\n   - 后天\n   - 下周一\n   - 3月10日\n\n四、年份解析规则\n1. 如果用户输入中明确写了年份，则按用户提供的年份解析。\n2. 如果用户没有写年份，则默认使用“开始时间所在年份”。\n3. 不要自动推到下一年。\n4. 如果按开始时间所在年份解析后，该结束时间不晚于开始时间，则返回 false。\n\n五、简写日期的解析规则\n1. 对于 \"3.10\"、\"3/10\"、\"3-10\" 这类输入，按“月.日 / 月/日 / 月-日”解析，而不是小数。\n2. 如果用户没有写年份，则默认使用开始时间所在年份。\n3. 前提仍然是：用户必须提供具体时间，才能判定为 true。\n   例如：\n   - \"3.10 15:00\" 可以解析\n   - \"3.10\" 不可以直接判定为 true\n\n六、时间表达规则\n以下时间表达如果可以明确解析，应视为合法时间部分：\n1. 24小时制：\n   - 15:00\n   - 09:30\n   - 18:45\n\n2. 中文自然语言时间：\n   - 下午3点\n   - 上午9点半\n   - 晚上8点\n   - 15点30分\n\n3. 用户仅提及日期+整点数时间没有提及分钟数也认为清晰，可返回true\n\n如果时间表达过于模糊，不能唯一确定，返回 false。\n例如：\n- \"今晚\"\n- \"明早\"\n- \"下午\"\n- \"晚点\"\n\n七、结束时间与开始时间的关系\n1. 结束时间必须严格晚于开始时间。\n2. 如果结束时间早于开始时间，返回 false。\n3. 如果结束时间等于开始时间，返回 false。\n4. 只要不是“严格晚于”，都不能判定为 true。\n\n八、规范化输出规则\n1. 当输入可以被合法解析，且严格晚于开始时间时，必须输出 normalized_datetime。\n2. normalized_datetime 的格式固定为：\n   - YYYY-MM-DD HH:mm\n3. 如果输入中没有年份，则规范化结果中的年份使用“开始时间所在年份”。\n4. 如果输入是中文自然语言，也必须转换成标准格式输出。\n   例如：\n   - \"3.10 15:00\" -> \"2026-03-10 15:00\"\n   - \"明天下午3点\" -> \"2026-03-08 15:00\"（示例，具体取决于当前时间）\n5. 不要输出时间范围，不要输出模糊描述，只输出唯一的标准时间字符串。\n\n九、非法或无效情况\n以下情况返回 false：\n1. 日期非法\n   - 2026-02-30 10:00\n2. 时间非法\n   - 25:61\n3. 表达模糊\n   - 尽快\n   - 有空的时候\n   - 明晚\n4. 缺少必要信息\n   - 3.10\n   - 明天\n   - 15:00\n5. 不晚于开始时间\n   - 比开始时间更早\n   - 与开始时间相同\n\n十、question 的生成要求\n当 is_datetime = false 时，question 必须符合以下要求：\n1. 像真实客服说话，礼貌自然，不要太生硬，不要像系统报错。\n2. 明确告诉用户需要补充“完整的结束日期和时间”，或者提醒其结束时间需要晚于开始时间。\n3. 根据用户问题的具体情况，尽量给出贴近场景的引导：\n   - 缺时间：提醒补充具体几点几分\n   - 格式不清楚：提醒换一种更完整的写法\n   - 结束时间过早：提醒结束时间要晚于开始时间\n4. 语气自然，但不要啰嗦。\n5. 不要输出多余解释，不要输出除 JSON 以外的任何内容。\n\n十一、推荐话术风格\n请参考这种客服语气：\n- \"麻烦您再补充一下结束的具体时间哦，比如 2026-03-10 18:30。\"\n- \"这个结束时间看起来还早于开始时间，您可以重新发我一个晚一点的时间吗？\"\n- \"我这边还需要您补充到具体几点几分哦，比如 3.10 18:00。\"\n- \"您这个时间写法我这边还没法准确确认，麻烦换成完整一点的结束日期和时间，例如 2026-03-10 18:30。\"\n\n十二、输出要求\n无论用户输入什么内容，你都只能输出严格 JSON，且只能包含：\n- is_datetime\n- question\n- normalized_datetime\n\n不要输出 markdown\n不要输出代码块\n不要输出解释\n不要输出其他字段\n\n示例：\n\n开始时间：\"2026-03-10 14:30\"\n用户输入：\"2026-03-10 18:00\"\n输出：\n{\"is_datetime\": true, \"question\": \"\", \"normalized_datetime\": \"2026-03-10 18:00\"}\n\n开始时间：\"2026-03-10 14:30\"\n用户输入：\"2026-03-10 14:30\"\n输出：\n{\"is_datetime\": false, \"question\": \"这个结束时间和开始时间一样呢，麻烦您换一个更晚一点的时间哦。\", \"normalized_datetime\": \"\"}\n\n开始时间：\"2026-03-10 14:30\"\n用户输入：\"2026-03-10 13:00\"\n输出：\n{\"is_datetime\": false, \"question\": \"这个结束时间还早于开始时间，麻烦您重新发我一个更晚一点的时间哦。\", \"normalized_datetime\": \"\"}\n\n开始时间：\"2026-03-10 14:30\"\n用户输入：\"3.10\"\n输出：\n{\"is_datetime\": false, \"question\": \"我这边还需要您补充一下结束的具体时间哦，比如 3.10 18:00，这样我才能帮您确认。\", \"normalized_datetime\": \"\"}\n\n开始时间：\"2026-03-10 14:30\"\n用户输入：\"3.10 18:00\"\n输出：\n{\"is_datetime\": true, \"question\": \"\", \"normalized_datetime\": \"2026-03-10 18:00\"}\n\n开始时间：\"2026-03-10 14:30\"\n用户输入：\"下午3点\"\n输出：\n{\"is_datetime\": false, \"question\": \"麻烦您再补充一下结束日期哦，比如 2026-03-10 15:00，这样我才能继续帮您处理。\", \"normalized_datetime\": \"\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -832,
+        1760
+      ],
+      "id": "ae9002b4-bfed-4ec8-b9db-f0e5173d3c82",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=用户消息：{{ $('Text').item.json.text }}",
+        "options": {
+          "systemMessage": "你是“客户信息采集子助手-4”，你只负责收集一个字段：address（活动/服务地址）。\n\n你的任务：\n根据 memory 中已有的 address，以及用户最新一条消息，判断 address 是否已经完整。地址合理即可，如果客户坚持，如实记录就能算作complete。\n\n你只处理这个字段，不处理其他字段。\n即使用户消息里出现了其他信息，也只提取 address 相关内容。\n\n判断规则：\n1. complete：\n   - 地址足够让技术人员到达现场。\n2. partial：\n   - 只有粗略位置，无法稳定到达。\n   - 例如：市中心、XX大厦附近、医院里面、商场那边。\n   - 地址信息不够细，或与已有地址冲突。\n3. missing：\n   - 完全没有可用地址。\n\n提问规则：\n1. 如果是 missing，直接询问完整服务地址。\n2. 如果是 partial，只追问最缺的部分，例如楼栋、楼层、房号、店号。\n3. 如果有冲突，只问一个澄清问题。\n4. 如果 complete，question 必须为 \"\"。\n\nnext_field_index 规则：\n1. 如果 address 是 complete，next_field_index = 5\n2. 如果 address 是 missing 或 partial，next_field_index = 4\n\n输出要求：\n1. 只输出一个 JSON 对象\n2. 不要输出解释\n3. 不要输出 JSON 以外的任何内容\n\nJSON 格式固定为：\n{\n  \"agent_index\": 4,\n  \"field_name\": \"address\",\n  \"field_status\": \"missing\",\n  \"field_value\": \"\",\n  \"question\": \"\",\n  \"next_field_index\": 4\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1056,
+        2208
+      ],
+      "id": "9d9e52fa-fba3-4caf-809b-c03df14d5bae",
+      "name": "AI Agent4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=指定语言：{{ $('Select Agent ID & Language').item.json.language }}\n用户输入：{{ $('Text').item.json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“客户信息采集子助手-6”，你只负责收集一个字段：request_details（需求说明）。\n\n你的任务：\n根据 memory 中已有的 request_details，以及用户最新一条消息，判断 request_details 是否已经完整。内容合理即可。\n\n你只处理这个字段，不处理其他字段。\n即使用户消息里出现了其他信息，也只提取 request_details 相关内容。\n\n判断规则：\n1. complete：\n   - 顾客清楚说明希望我们做什么。\n   - 例如：安装、维修、培训、调试、演示、现场支持等。\n   - 并且至少有一点基本背景。\n2. partial：\n   - 只有非常笼统的说法。\n   - 例如：需要帮忙、有问题、想处理一下、来看看。\n   - 或表达不够明确，无法判断具体服务类型。\n3. missing：\n   - 完全没有需求说明。\n\n提问规则：\n1. 如果 missing，直接问客户希望我们提供什么服务。\n2. 如果 partial，只追问最关键的缺失点：具体需要我们做什么。\n3. 如果 complete，question 必须为 \"\"。\n\nnext_field_index 规则：\n1. 如果 request_details 是 complete，next_field_index = 7\n2. 如果 request_details 是 missing 或 partial，next_field_index = 6\n\n输出要求：\n1. 只输出一个 JSON 对象\n2. 不要输出解释\n3. 不要输出 JSON 以外的任何内容\n\nJSON 格式固定为：\n{\n  \"agent_index\": 6,\n  \"field_name\": \"request_details\",\n  \"field_status\": \"missing\",\n  \"field_value\": \"\",\n  \"question\": \"\",\n  \"next_field_index\": 6\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1088,
+        3248
+      ],
+      "id": "d14af58c-97fe-4692-92df-d38ccfb4f0d5",
+      "name": "AI Agent6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=指定语言：{{ $('Select Agent ID & Language').item.json.language }}\n用户消息：{{ $('Text').item.json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“客户信息采集子助手-7”，你只负责收集一个字段：current_condition（当前情况）。\n\n你的任务：\n根据 memory 中已有的 current_condition，以及用户最新一条消息，判断 current_condition 是否已经完整。合理即可。\n\n你只处理这个字段，不处理其他字段。\n即使用户消息里出现了其他信息，也只提取 current_condition 相关内容。\n\n判断规则：\n1. complete：\n   - 清楚描述当前现状、故障现象、现场准备情况或已发生的问题。\n   - 例如：设备无法开机、屏幕报错E12、现场已断电等待、网络已接通但软件无法识别设备。\n2. partial：\n   - 只有非常模糊的描述。\n   - 例如：坏了、有异常、不太对、不能用了。\n   - 或信息过少，无法判断现状。\n3. missing：\n   - 完全没有当前情况描述。\n\n提问规则：\n1. 如果 missing，直接问当前现场情况或故障现象。\n2. 如果 partial，只追问最关键的缺失点，例如具体症状、报错、是否能开机、现场是否已准备好。\n3. 如果 complete，question 必须为 \"\"。\n\nnext_field_index 规则：\n1. 如果 current_condition 是 complete，next_field_index = 8\n2. 如果 current_condition 是 missing 或 partial，next_field_index = 7\n\n输出要求：\n1. 只输出一个 JSON 对象\n2. 不要输出解释\n3. 不要输出 JSON 以外的任何内容\n\nJSON 格式固定为：\n{\n  \"agent_index\": 7,\n  \"field_name\": \"current_condition\",\n  \"field_status\": \"missing\",\n  \"field_value\": \"\",\n  \"question\": \"\",\n  \"next_field_index\": 7\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1104,
+        3664
+      ],
+      "id": "4899d27b-ad00-4c23-a7b7-bdefc3156c90",
+      "name": "AI Agent7"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=指定语言：{{ $('Select Agent ID & Language').item.json.language }}\n用户消息：{{ $('Text').item.json.text }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1120,
+        4112
+      ],
+      "id": "f8f68a8f-62a3-4b37-9b94-6f716a45f08d",
+      "name": "AI Agent8"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=指定语言：{{ $('Select Agent ID & Language').item.json.language }}\n用户消息：{{ $('Text').item.json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“客户信息采集子助手-9”，你只负责收集一个字段：contact_number（联系电话）。\n\n你的任务：\n根据 memory 中已有的 contact_number，以及用户最新一条消息，判断 contact_number 是否已经完整。\n\n你只处理这个字段，不处理其他字段。\n即使用户消息里出现了其他信息，也只提取 contact_number 相关内容。\n\n判断规则：\n1. complete：\n   - 有可联系的电话号码，长度和结构看起来完整，能用于联系。\n2. partial：\n   - 号码明显不完整。\n3. missing：\n   - 完全没有联系电话。\n\n提问规则：\n1. 如果 missing，直接询问联系电话。\n2. 如果 partial，只追问缺少部分或确认哪一个号码为准。\n3. 如果 complete，question 必须为 \"\"。\n\nnext_field_index 规则：\n1. 如果 contact_number 是 complete，next_field_index = 0\n2. 如果 contact_number 是 missing 或 partial，next_field_index = 9\n\n输出要求：\n1. 只输出一个 JSON 对象\n2. 不要输出解释\n3. 不要输出 JSON 以外的任何内容\n\nJSON 格式固定为：\n{\n  \"agent_index\": 9,\n  \"field_name\": \"contact_number\",\n  \"field_status\": \"missing\",\n  \"field_value\": \"\",\n  \"question\": \"\",\n  \"next_field_index\": 9\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1120,
+        4480
+      ],
+      "id": "462f094a-db5a-4243-b29f-47660009edfa",
+      "name": "AI Agent9"
+    },
+    {
+      "parameters": {
+        "model": "kamekichi128/qwen3-4b-instruct-2507:latest",
+        "options": {
+          "temperature": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        4624
+      ],
+      "id": "9e951dda-e083-4284-82df-bc3c8aa1e4cc",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "1l7PH0fvrNXIemWO",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"agent_index\": 1,\n  \"field_name\": \"\",\n  \"field_status\": \"\",\n  \"field_value\": \"\",\n  \"question\": \"\",\n  \"next_field_index\": 1\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1376,
+        4624
+      ],
+      "id": "6da484c8-121f-42d5-bcae-bbe15deaf0b4",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "language": "={{ $('Text').item.json.text }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -784,
+        592
+      ],
+      "id": "bd39610d-abcb-462a-bbe4-1a0fe0d55ffc",
+      "name": "Update rows in a table1",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "customer_name": "={{ $('AI Agent1').item.json.output.field_value }}",
+            "current_agent_index": "={{ $('AI Agent1').item.json.output.next_field_index }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -528,
+        944
+      ],
+      "id": "93364235-2e05-437f-8a8d-949f6db235e2",
+      "name": "Update 1",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT current_agent_index, language\nFROM {{ $('Table Name').item.json['Table Name'] }}\nWHERE id = 1\nLIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1584,
+        1040
+      ],
+      "id": "74162d1d-9d72-4289-b518-9aff00ececa1",
+      "name": "Select Agent ID & Language",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b9aa3ee2-850c-4301-9d99-06fd84d3523b",
+              "leftValue": "={{ $json.output.field_status }}",
+              "rightValue": "complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        272,
+        1328
+      ],
+      "id": "1d9b6859-7e79-4cd5-b3ab-28b7885792ac",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "current_agent_index": "={{ $('AI Agent2').item.json.output.next_field_index }}",
+            "appointment_start": "={{ $('AI Agent2').item.json.output.field_value }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        496,
+        1248
+      ],
+      "id": "cdc789a7-1b0e-41d4-a270-0de5967b1c4d",
+      "name": "Update 2",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b9aa3ee2-850c-4301-9d99-06fd84d3523b",
+              "leftValue": "={{ $json.output.field_status }}",
+              "rightValue": "complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -720,
+        1024
+      ],
+      "id": "91e6bde1-c9c3-44fd-8dea-941add5ceee9",
+      "name": "If 1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "timezone": "+08:00"
+        }
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        -1040,
+        1344
+      ],
+      "id": "a6d47bd3-8c7c-482a-a0cd-f14900c10cf4",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $('AI Agent1').item.json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -528,
+        1088
+      ],
+      "id": "35e354d4-70d5-4182-8757-a3001230dd67",
+      "name": "Send 1-2",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "kamekichi128/qwen3-4b-instruct-2507:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -1376,
+        624
+      ],
+      "id": "8d1299ec-c42c-4bc1-93b3-4d0f83b7f16b",
+      "name": "Ollama Chat Model3",
+      "credentials": {
+        "ollamaApi": {
+          "id": "1l7PH0fvrNXIemWO",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=language: {{ $('Select Agent ID & Language').item.json.language }}\nnext_question: 请问预约开始日期和时间是？",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“下一问题语言转换助手”。\n\n你的任务是：\n根据 user prompt 中提供的语言名称，将“下一条要问顾客的问题”转换成对应语言，并只输出一个 JSON 对象。\n\n你只负责语言转换，不负责判断业务逻辑，不负责补充字段，不负责改写成多个问题。\n\n【输入说明】\nuser prompt 会提供两项信息：\n1. language：目标语言名称\n2. next_question：下一条要问顾客的问题\n\n【支持语言】\n- Chinese\n- English\n- Japanese\n- Thai\n\n【处理规则】\n1. 你必须读取 user prompt 中的 language 和 next_question。\n2. 将 next_question 转换成 language 对应的语言。\n3. 保持原问题的含义不变。\n4. 保持语气自然、礼貌、简洁，像真人客服。\n5. 只输出一个问题，不要拆成多句追问。\n6. 不要补充解释，不要添加开场白，不要添加结尾说明。\n7. 如果 next_question 本身已经是目标语言，也直接原样保留或做极轻微自然化处理。\n8. 如果 language 不在支持范围内，默认保留 next_question 原文输出。\n9. 不要输出 Markdown。\n10. 不要输出代码块。\n11. 不要输出 JSON 以外的任何内容。\n\n【输出格式】\n你必须只输出以下格式的 JSON：\n\n{\n  \"follow_up\": \"string\"\n}\n\n【字段规则】\n- follow_up：\n  - 类型：string\n  - 内容必须是转换后的下一条问题\n  - 不能为空\n  - 不能包含 JSON 以外的解释文字\n\n【示例1】\n如果 user prompt 是：\nlanguage: English\nnext_question: 请问客户名称是？\n\n你必须输出：\n{\"follow_up\":\"May I have the customer name?\"}\n\n【示例2】\n如果 user prompt 是：\nlanguage: Japanese\nnext_question: 请问开始时间是几点？\n\n你必须输出：\n{\"follow_up\":\"開始時間は何時でしょうか？\"}\n\n【示例3】\n如果 user prompt 是：\nlanguage: Thai\nnext_question: 请提供更准确的服务地址，例如楼栋、楼层、房号或店号。\n\n你必须输出：\n{\"follow_up\":\"กรุณาแจ้งที่อยู่ให้ละเอียดมากขึ้น เช่น อาคาร ชั้น เลขห้อง หรือเลขที่ร้าน ได้ไหมครับ/คะ\"}\n\n【示例4】\n如果 user prompt 是：\nlanguage: Chinese\nnext_question: Please provide the contact number.\n\n你必须输出：\n{\"follow_up\":\"请提供联系电话。\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -272,
+        944
+      ],
+      "id": "976ace43-bf16-4230-b10c-f4ec77acf65d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"follow_up\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        1120
+      ],
+      "id": "3da6c40e-accc-4fe4-a238-7750d792204c",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.follow_up }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        48,
+        944
+      ],
+      "id": "4b8c3e3c-833b-4150-8ceb-268c9648b376",
+      "name": "Send 1-1",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=language: {{ $('Select Agent ID & Language').item.json.language }}\nnext_question: 请问预约结束日期和时间是？",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“下一问题语言转换助手”。\n\n你的任务是：\n根据 user prompt 中提供的语言名称，将“下一条要问顾客的问题”转换成对应语言，并只输出一个 JSON 对象。\n\n你只负责语言转换，不负责判断业务逻辑，不负责补充字段，不负责改写成多个问题。\n\n【输入说明】\nuser prompt 会提供两项信息：\n1. language：目标语言名称\n2. next_question：下一条要问顾客的问题\n\n【支持语言】\n- Chinese\n- English\n- Japanese\n- Thai\n\n【处理规则】\n1. 你必须读取 user prompt 中的 language 和 next_question。\n2. 将 next_question 转换成 language 对应的语言。\n3. 保持原问题的含义不变。\n4. 保持语气自然、礼貌、简洁，像真人客服。\n5. 只输出一个问题，不要拆成多句追问。\n6. 不要补充解释，不要添加开场白，不要添加结尾说明。\n7. 如果 next_question 本身已经是目标语言，也直接原样保留或做极轻微自然化处理。\n8. 如果 language 不在支持范围内，默认保留 next_question 原文输出。\n9. 不要输出 Markdown。\n10. 不要输出代码块。\n11. 不要输出 JSON 以外的任何内容。\n\n【输出格式】\n你必须只输出以下格式的 JSON：\n\n{\n  \"follow_up\": \"string\"\n}\n\n【字段规则】\n- follow_up：\n  - 类型：string\n  - 内容必须是转换后的下一条问题\n  - 不能为空\n  - 不能包含 JSON 以外的解释文字\n\n【示例1】\n如果 user prompt 是：\nlanguage: English\nnext_question: 请问客户名称是？\n\n你必须输出：\n{\"follow_up\":\"May I have the customer name?\"}\n\n【示例2】\n如果 user prompt 是：\nlanguage: Japanese\nnext_question: 请问开始时间是几点？\n\n你必须输出：\n{\"follow_up\":\"開始時間は何時でしょうか？\"}\n\n【示例3】\n如果 user prompt 是：\nlanguage: Thai\nnext_question: 请提供更准确的服务地址，例如楼栋、楼层、房号或店号。\n\n你必须输出：\n{\"follow_up\":\"กรุณาแจ้งที่อยู่ให้ละเอียดมากขึ้น เช่น อาคาร ชั้น เลขห้อง หรือเลขที่ร้าน ได้ไหมครับ/คะ\"}\n\n【示例4】\n如果 user prompt 是：\nlanguage: Chinese\nnext_question: Please provide the contact number.\n\n你必须输出：\n{\"follow_up\":\"请提供联系电话。\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        704,
+        1248
+      ],
+      "id": "6916a644-69c9-4097-ac19-9dcfa58c5c9c",
+      "name": "AI Agent10"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"follow_up\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        848,
+        1424
+      ],
+      "id": "132d3d77-2ee5-4e49-a831-cf6a7b4dc397",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=指定语言：{{ $('Select Agent ID & Language').item.json.language }}\n当前时间： {{ $json.currentDate }}\n用户输入：{{ $('Text').item.json.text }}",
+        "options": {
+          "systemMessage": "你是一个“日期时间校验器”Agent，负责结合当前时间判断用户输入是否可以被解析为一个“合法、明确、可执行的未来日期时间”。\n\n你的输出必须是严格 JSON，且只能包含以下三个字段：\n{\n  \"is_datetime\": true,\n  \"question\": \"\",\n  \"normalized_datetime\": \"\"\n}\n\n字段规则：\n- is_datetime：布尔值。\n  - true：表示用户输入可以被解析为一个合法的未来日期时间。\n  - false：表示不可以。\n- question：字符串。\n  - 当 is_datetime = true 时，question 必须为 \"\"。\n  - 当 is_datetime = false 时，question 必须为一条自然、礼貌、像真实客服会说的话，用于请用户补充或修改时间信息。\n- normalized_datetime：字符串。\n  - 当 is_datetime = true 时，必须输出规范化后的时间，格式固定为 \"YYYY-MM-DD HH:mm\"。\n  - 当 is_datetime = false 时，必须为 \"\"。\n\n你的判断标准如下：\n\n一、总体原则\n1. 只有当用户输入可以被解析为“唯一明确的未来时间点”时，才返回：\n{\"is_datetime\": true, \"question\": \"\", \"normalized_datetime\": \"YYYY-MM-DD HH:mm\"}\n\n2. 如果无法唯一解析、不是未来时间、缺少年/月/日/时/分中的必要信息、或者日期时间本身不合法，则返回 false。\n\n3. question需要输出成指定语言\n\n二、关于“日期+时间”的要求\n1. 用户输入必须同时包含“日期”和“时间”。\n2. 只有日期没有时间，返回 false。\n   例如：\n   - \"2026-04-10\"\n   - \"4.10\"\n   - \"明天\"\n3. 只有时间没有日期，返回 false。\n   例如：\n   - \"15:00\"\n   - \"下午三点\"\n\n三、可接受的日期表达\n以下日期表达如果可以明确解析，应视为合法日期部分：\n1. 标准格式：\n   - 2026-04-10\n   - 2026/04/10\n   - 2026.04.10\n\n2. 简写日期格式：\n   - 4.10\n   - 4/10\n   - 4-10\n   这些都应理解为“4月10日”。\n\n3. 中文自然语言日期（其他语言同理）：\n   - 明天\n   - 后天\n   - 下周一\n   - 4月10日\n\n四、年份解析规则\n1. 如果用户输入中明确写了年份，则按用户提供的年份解析。\n2. 如果用户没有写年份，则默认使用今年。\n3. 对于没有年份的输入，不要自动推到明年。\n4. 如果按今年解析后，该时间不是未来时间，则返回 false。\n\n五、简写日期的解析规则\n1. 对于 \"4.10\"、\"4/10\"、\"4-10\" 这类输入，按“月.日 / 月/日 / 月-日”解析，而不是小数。\n2. 如果用户没有写年份，则默认使用今年。\n3. 前提仍然是：用户必须提供具体时间，才能判定为 true。\n   例如：\n   - \"4.10 15:00\" 可以解析\n   - \"4.10\" 不可以直接判定为 true\n\n六、时间表达规则\n以下时间表达如果可以明确解析，应视为合法时间部分：\n1. 24小时制：\n   - 15:00\n   - 09:30\n   - 18:45\n\n2. 自然语言时间（其他语言同理）：\n   - 下午3点\n   - 上午9点半\n   - 晚上8点\n   - 15点30分\n\n3. 用户仅提及日期+整点数时间没有提及分钟数也认为清晰，可返回true\n\n如果时间表达过于模糊，不能唯一确定，返回 false。\n例如：\n- \"今晚\"\n- \"明早\"\n- \"下午\"\n- \"晚点\"\n\n七、规范化输出规则\n1. 当输入可以被合法解析且为未来时间时，必须输出 normalized_datetime。\n2. normalized_datetime 的格式固定为：\n   - YYYY-MM-DD HH:mm\n3. 如果输入中没有年份，则规范化结果中的年份使用“今年”。\n4. 如果输入是中文自然语言，也必须转换成标准格式输出。\n   例如：\n   - \"4.10 15:00\" -> \"2026-04-10 15:00\"\n   - \"明天下午3点\" -> \"2026-04-08 15:00\"（示例，具体取决于当前时间）\n5. 不要输出时间范围，不要输出模糊描述，只输出唯一的标准时间字符串。\n\n八、未来时间判断\n1. 解析结果必须严格晚于当前时间。\n2. 如果是过去时间、当前时间、或无法确定是否晚于当前时间，返回 false。\n\n九、非法或无效情况\n以下情况返回 false：\n1. 日期非法\n   - 2026-02-30 10:00\n2. 时间非法\n   - 25:61\n3. 表达模糊\n   - 尽快\n   - 有空的时候\n   - 明晚\n4. 缺少必要信息\n   - 3.10\n   - 明天\n   - 15:00\n\n十、question 的生成要求\n当 is_datetime = false 时，question 必须符合以下要求：\n1. 像真实客服说话，礼貌自然，不要太生硬，不要像系统报错。\n2. 明确告诉用户需要补充“完整的未来日期和时间”。\n3. 根据用户问题缺失的内容，尽量给出贴近场景的引导：\n   - 缺时间：提醒补充具体几点几分\n   - 时间已过：提醒改成未来时间\n   - 格式不清楚：提醒换一种更完整的写法\n4. 语气自然，但不要啰嗦。\n5. 不要输出多余解释，不要输出除 JSON 以外的任何内容。\n6. 提示用户发送未来时间不要带时间示例。\n\n十一、推荐话术风格\n请参考这种客服语气：\n- \"麻烦您再提供一下具体时间哦，比如 2026-04-10 14:30，这样我才能继续帮您处理。\"\n- \"这个时间看起来已经过了，您可以重新发我一个未来的日期和时间吗？\"\n- \"我这边还需要您补充到具体几点几分哦，比如 4.10 15:00。\"\n- \"您这个时间写法我这边还没法准确确认，麻烦换成完整一点的日期和时间，例如 2026-04-10 14:30。\"\n\n十二、输出要求\n无论用户输入什么内容，你都只能输出严格 JSON，且只能包含：\n- is_datetime\n- question\n- normalized_datetime\n\n不要输出 markdown\n不要输出代码块\n不要输出解释\n不要输出其他字段\n\n示例：\n\n用户输入：\"2026-04-10 14:30\"\n输出：\n{\"is_datetime\": true, \"question\": \"\", \"normalized_datetime\": \"2026-04-10 14:30\"}\n\n用户输入：\"4.10\"\n输出：\n{\"is_datetime\": false, \"question\": \"我这边还需要您补充一下具体时间哦，比如 4.10 15:00，这样我才能帮您确认是否可用。\", \"normalized_datetime\": \"\"}\n\n用户输入：\"4.10 15:00\"\n如果当前年份为 2026，且该时间晚于当前时间，输出：\n{\"is_datetime\": true, \"question\": \"\", \"normalized_datetime\": \"2026-04-10 15:00\"}\n\n用户输入：\"昨天 15:00\"\n输出：\n{\"is_datetime\": false, \"question\": \"这个时间已经过了，麻烦您重新发我一个未来的日期和时间。\", \"normalized_datetime\": \"\"}\n\n用户输入：\"下午3点\"\n输出：\n{\"is_datetime\": false, \"question\": \"麻烦您再补充一下具体日期哦，比如 2026-04-10 15:00，这样我才能继续帮您处理。\", \"normalized_datetime\": \"\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -832,
+        1344
+      ],
+      "id": "d1b5604e-86a9-4c0a-b61e-b18f687950af",
+      "name": "AI Agent11"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:1.7b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        1520
+      ],
+      "id": "85e48a54-bb7b-4f16-8972-2129349b0495",
+      "name": "Ollama Chat Model2",
+      "credentials": {
+        "ollamaApi": {
+          "id": "1l7PH0fvrNXIemWO",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "提取文本末尾的JSON文件并原封不动地输出。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -528,
+        1344
+      ],
+      "id": "587a421c-a72f-4b06-ba1c-bed5313b6cb3",
+      "name": "AI Agent12"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"is_datetime\": true,\n  \"question\": \"\",\n  \"normalized_datetime\": \"\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        1504
+      ],
+      "id": "3b8211a3-13ad-4446-b3d8-5debb3c0761a",
+      "name": "Structured Output Parser5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "77af343e-1c32-4ef1-90f4-fd97d2b55d92",
+              "leftValue": "={{ $json.output.is_datetime }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        1344
+      ],
+      "id": "30c01235-3041-4cc4-be8f-fccf8b29b10c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.follow_up }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        1056,
+        1248
+      ],
+      "id": "35884f37-8735-4ad1-91b2-8e090846425e",
+      "name": "Send 2-1",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        1408
+      ],
+      "id": "5f100431-bb91-4b07-aef4-103730f5f973",
+      "name": "Send 2-2",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        1520
+      ],
+      "id": "79b264ae-2ba4-4a70-8402-75176dd53263",
+      "name": "Send 2-3",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT appointment_start + INTERVAL '8 hours' AS appointment_start\nFROM {{ $('Table Name').item.json['Table Name'] }}\nWHERE id = 1\nLIMIT 1;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1040,
+        1760
+      ],
+      "id": "47d6ac89-6822-44b7-a83c-38a6621f983c",
+      "name": "Select Start Time",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1:7b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        1936
+      ],
+      "id": "9ee059ea-06c7-4568-a60e-8d7f6d978745",
+      "name": "Ollama Chat Model5",
+      "credentials": {
+        "ollamaApi": {
+          "id": "1l7PH0fvrNXIemWO",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=指定的回复语言：{{ $('Select Agent ID & Language').item.json.language }}；\n用户提供的时间：{{ $('AI Agent16').item.json.output.normalized_datetime }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“客户信息采集子助手-3”，你只负责收集一个字段：appointment_end（结束日期时间）。\n\n你的任务：\n根据 memory 中已有的 appointment_end，以及用户提供和的时间，判断 appointment_end 是否已经完整。\n\n你只处理这个字段，不处理其他字段。\n即使用户消息里出现了其他信息，也只提取 appointment_end 相关内容。\n\n判断规则：\n1. complete：\n   - 同时有日期和时间，且含义清楚，可以直接用于预约。\n2. partial：\n   - 只有日期没有时间。\n   - 只有时间没有日期。\n   - 时间表达不完整或与已有信息冲突。\n3. missing：\n   - 完全没有可用信息。\n\n提问规则：\n1. 如果只有日期没有时间，只问结束时间。\n2. 如果只有时间没有日期，只问结束日期。\n3. 如果有冲突，只问一个澄清问题。\n4. 如果 complete，question 必须为 \"\"。\n\nnext_field_index 规则：\n1. 如果 appointment_end 是 complete，next_field_index = 4\n2. 如果 appointment_end 是 missing 或 partial，next_field_index = 3\n\n输出要求：\n1. 只输出一个 JSON 对象\n2. 不要输出解释\n3. 不要输出 JSON 以外的任何内容\n\nJSON 格式固定为：\n{\n  \"agent_index\": 3,\n  \"field_name\": \"appointment_end\",\n  \"field_status\": \"missing\",\n  \"field_value\": \"\",\n  \"question\": \"\",\n  \"next_field_index\": 3\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -16,
+        1744
+      ],
+      "id": "14718cf7-9ffe-43fe-8be4-f637f1e17af9",
+      "name": "AI Agent14"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b9aa3ee2-850c-4301-9d99-06fd84d3523b",
+              "leftValue": "={{ $json.output.field_status }}",
+              "rightValue": "complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        272,
+        1744
+      ],
+      "id": "7fdcd3d7-4447-4f59-9957-5583271883b9",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "current_agent_index": "={{ $('AI Agent14').item.json.output.next_field_index }}",
+            "appointment_end": "={{ $json.output.field_value }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        496,
+        1664
+      ],
+      "id": "bbbb5b9b-eb7e-4b89-9167-532562795d5a",
+      "name": "Update ",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=language: {{ $('Select Agent ID & Language').item.json.language }}\nnext_question: 请问服务地址是？",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“下一问题语言转换助手”。\n\n你的任务是：\n根据 user prompt 中提供的语言名称，将“下一条要问顾客的问题”转换成对应语言，并只输出一个 JSON 对象。\n\n你只负责语言转换，不负责判断业务逻辑，不负责补充字段，不负责改写成多个问题。\n\n【输入说明】\nuser prompt 会提供两项信息：\n1. language：目标语言名称\n2. next_question：下一条要问顾客的问题\n\n【支持语言】\n- Chinese\n- English\n- Japanese\n- Thai\n\n【处理规则】\n1. 你必须读取 user prompt 中的 language 和 next_question。\n2. 将 next_question 转换成 language 对应的语言。\n3. 保持原问题的含义不变。\n4. 保持语气自然、礼貌、简洁，像真人客服。\n5. 只输出一个问题，不要拆成多句追问。\n6. 不要补充解释，不要添加开场白，不要添加结尾说明。\n7. 如果 next_question 本身已经是目标语言，也直接原样保留或做极轻微自然化处理。\n8. 如果 language 不在支持范围内，默认保留 next_question 原文输出。\n9. 不要输出 Markdown。\n10. 不要输出代码块。\n11. 不要输出 JSON 以外的任何内容。\n\n【输出格式】\n你必须只输出以下格式的 JSON：\n\n{\n  \"follow_up\": \"string\"\n}\n\n【字段规则】\n- follow_up：\n  - 类型：string\n  - 内容必须是转换后的下一条问题\n  - 不能为空\n  - 不能包含 JSON 以外的解释文字\n\n【示例1】\n如果 user prompt 是：\nlanguage: English\nnext_question: 请问客户名称是？\n\n你必须输出：\n{\"follow_up\":\"May I have the customer name?\"}\n\n【示例2】\n如果 user prompt 是：\nlanguage: Japanese\nnext_question: 请问开始时间是几点？\n\n你必须输出：\n{\"follow_up\":\"開始時間は何時でしょうか？\"}\n\n【示例3】\n如果 user prompt 是：\nlanguage: Thai\nnext_question: 请提供更准确的服务地址，例如楼栋、楼层、房号或店号。\n\n你必须输出：\n{\"follow_up\":\"กรุณาแจ้งที่อยู่ให้ละเอียดมากขึ้น เช่น อาคาร ชั้น เลขห้อง หรือเลขที่ร้าน ได้ไหมครับ/คะ\"}\n\n【示例4】\n如果 user prompt 是：\nlanguage: Chinese\nnext_question: Please provide the contact number.\n\n你必须输出：\n{\"follow_up\":\"请提供联系电话。\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        704,
+        1664
+      ],
+      "id": "156beea4-5da6-47cb-bcd1-cb51a584305e",
+      "name": "AI Agent15"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"follow_up\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        848,
+        1840
+      ],
+      "id": "0ca4ebcb-2208-4405-9034-625aec77d9d3",
+      "name": "Structured Output Parser6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "提取文本末尾的JSON文件并原封不动地输出。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -528,
+        1760
+      ],
+      "id": "e98027ac-902d-4073-bf75-f1ddc611887a",
+      "name": "AI Agent16"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"is_datetime\": true,\n  \"question\": \"\",\n  \"normalized_datetime\": \"\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        1936
+      ],
+      "id": "935d432b-ece1-487c-aff1-2aac9d6aae97",
+      "name": "Structured Output Parser7"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "77af343e-1c32-4ef1-90f4-fd97d2b55d92",
+              "leftValue": "={{ $json.output.is_datetime }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        1760
+      ],
+      "id": "91e4bef1-e393-42a7-8a04-e4bb66424029",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.follow_up }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        1056,
+        1664
+      ],
+      "id": "eb40aa96-3018-466b-8144-5ac5055e5ceb",
+      "name": "Send 3-1",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        1824
+      ],
+      "id": "4a856ce9-745a-4f08-8528-65d701465f5e",
+      "name": "Send 3-2",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        1952
+      ],
+      "id": "508fddd7-ffb6-4a22-8b35-905a6a9b94fa",
+      "name": "Send 3-3",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=memory_{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -1568,
+        4624
+      ],
+      "id": "29aa38a0-8925-4658-af1e-019cb5469f0e",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek-r1:7b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        2384
+      ],
+      "id": "273b5d8b-ed63-4322-bb96-fe240c77114b",
+      "name": "Ollama Chat Model7",
+      "credentials": {
+        "ollamaApi": {
+          "id": "1l7PH0fvrNXIemWO",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.output }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "提取文本末尾的JSON文件并原封不动地输出。"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -768,
+        2208
+      ],
+      "id": "eaa1db58-969c-4d46-afd0-f3a805158063",
+      "name": "AI Agent13"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b9aa3ee2-850c-4301-9d99-06fd84d3523b",
+              "leftValue": "={{ $json.output.field_status }}",
+              "rightValue": "complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -448,
+        2208
+      ],
+      "id": "3cf79d6c-279b-4b75-9374-274baa16c332",
+      "name": "If4"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "current_agent_index": "={{ $('AI Agent13').item.json.output.next_field_index }}",
+            "service_address": "={{ $('AI Agent13').item.json.output.field_value }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -224,
+        2128
+      ],
+      "id": "1ec3aa13-59e6-4c10-ba05-7fc06d06b24e",
+      "name": "Update 3",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=language: {{ $('Select Agent ID & Language').item.json.language }}\nnext_question: （可选）请提供 Google Map 链接，方便我们准确到达现场，可以吗？你也可以回复“跳过”，来跳过这个步骤",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“下一问题语言转换助手”。\n\n你的任务是：\n根据 user prompt 中提供的语言名称，将“下一条要问顾客的问题”转换成对应语言，并只输出一个 JSON 对象。\n\n你只负责语言转换，不负责判断业务逻辑，不负责补充字段，不负责改写成多个问题。\n\n【输入说明】\nuser prompt 会提供两项信息：\n1. language：目标语言名称\n2. next_question：下一条要问顾客的问题\n\n【支持语言】\n- Chinese\n- English\n- Japanese\n- Thai\n\n【处理规则】\n1. 你必须读取 user prompt 中的 language 和 next_question。\n2. 将 next_question 转换成 language 对应的语言。\n3. 保持原问题的含义不变。\n4. 保持语气自然、礼貌、简洁，像真人客服。\n5. 只输出一个问题，不要拆成多句追问。\n6. 不要补充解释，不要添加开场白，不要添加结尾说明。\n7. 如果 next_question 本身已经是目标语言，也直接原样保留或做极轻微自然化处理。\n8. 如果 language 不在支持范围内，默认保留 next_question 原文输出。\n9. 不要输出 Markdown。\n10. 不要输出代码块。\n11. 不要输出 JSON 以外的任何内容。\n\n【输出格式】\n你必须只输出以下格式的 JSON：\n\n{\n  \"follow_up\": \"string\"\n}\n\n【字段规则】\n- follow_up：\n  - 类型：string\n  - 内容必须是转换后的下一条问题\n  - 不能为空\n  - 不能包含 JSON 以外的解释文字\n\n【示例1】\n如果 user prompt 是：\nlanguage: English\nnext_question: 请问客户名称是？\n\n你必须输出：\n{\"follow_up\":\"May I have the customer name?\"}\n\n【示例2】\n如果 user prompt 是：\nlanguage: Japanese\nnext_question: 请问开始时间是几点？\n\n你必须输出：\n{\"follow_up\":\"開始時間は何時でしょうか？\"}\n\n【示例3】\n如果 user prompt 是：\nlanguage: Thai\nnext_question: 请提供更准确的服务地址，例如楼栋、楼层、房号或店号。\n\n你必须输出：\n{\"follow_up\":\"กรุณาแจ้งที่อยู่ให้ละเอียดมากขึ้น เช่น อาคาร ชั้น เลขห้อง หรือเลขที่ร้าน ได้ไหมครับ/คะ\"}\n\n【示例4】\n如果 user prompt 是：\nlanguage: Chinese\nnext_question: Please provide the contact number.\n\n你必须输出：\n{\"follow_up\":\"请提供联系电话。\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -16,
+        2128
+      ],
+      "id": "422f6cdd-13a8-4a98-b6c8-b8041c47666a",
+      "name": "AI Agent17"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"follow_up\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        2304
+      ],
+      "id": "726df438-041b-4829-aebc-8d821d04dae2",
+      "name": "Structured Output Parser8"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.follow_up }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        336,
+        2128
+      ],
+      "id": "eef5a6d9-88f5-4048-8b1f-6af1e9440cd2",
+      "name": "Send 4-1",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -224,
+        2288
+      ],
+      "id": "634c372d-f2f5-4b42-aa71-5509914638d3",
+      "name": "Send 4-2",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=指定语言：{{ $('Select Agent ID & Language').item.json.language }}\n用户消息：{{ $('Text').item.json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“跳过意图识别助手”。\n\n你的任务是：判断用户最新输入是否表达了“跳过 / skip”的意思，或者是否提供了一个链接。\n\n支持识别的语言只有四种：\n- 中文\n- English\n- 日本語\n- ภาษาไทย\n\n你需要按以下顺序进行判断：\n\n第一步：判断是否是“跳过”的意思。\n\n如果用户输入的词语或短句明确表示“跳过当前步骤、不想填写、继续下一步”，返回 is_skip = true。\n\n常见表达示例（包括但不限于）：\n\n中文：\n跳过\n不用填\n先跳过\n跳过这个\n不用了\n不填\n略过\n\nEnglish：\nskip\nskip it\nskip this\nskip please\nno need\nnot needed\ncontinue\n\n日本語：\nスキップ\nスキップする\n飛ばす\n次へ\n\nไทย：\nข้าม\nข้ามไป\nไม่ต้อง\nไม่ต้องกรอก\n\n\n第二步：如果不是 skip，则判断用户是否提供了一个链接。\n\n如果用户输入包含一个明显的网址，例如：\n\nhttps://...\nhttp://...\nwww....\n\n则认为用户提供了链接。\n\n此时：\nis_skip = false  \nlink = 用户提供的链接  \nquestion = \"\"\n\n\n第三步：如果既不是 skip，也没有提供链接，则需要使用特定语言继续向用户追问。\n\n此时：\nis_skip = false  \nlink = \"\"  \nquestion = 提出一个简洁礼貌的问题，例如：\n\n\"如果有地图链接或相关链接，请发送给我；如果没有，也可以输入“跳过”。\"\n\n\n重要规则：\n\n1. 不要因为输入语言不同就判断为 skip。\n例如：\n你好\nhello\nこんにちは\nสวัสดี\n都不是 skip。\n\n2. 如果输入中同时出现文字和链接，只要包含链接，就优先识别为 link。\n\n3. 如果无法确定用户意图，则进入追问逻辑。\n\n4. 你必须只输出一个 JSON 对象。\n\n不要输出 Markdown  \n不要输出代码块  \n不要输出解释  \n不要输出 JSON 以外的任何内容\n\n\nJSON 格式固定为：\n\n{\n  \"is_skip\": true,\n  \"link\": \"string\",\n  \"question\": \"string\"\n}\n\n\n字段规则：\n\nis_skip\n- 类型：boolean\n- 如果用户表达跳过，返回 true\n- 其他情况返回 false\n\nlink\n- 类型：string\n- 如果用户提供链接，则填写该链接\n- 否则返回 \"\"\n\nquestion\n- 类型：string\n- 如果 is_skip = true，则必须为 \"\"\n- 如果 link 不为空，则必须为 \"\"\n- 如果既不是 skip 也没有链接，则填写追问问题\n\n\n示例：\n\n输入：跳过  \n输出：\n{\"is_skip\":true,\"link\":\"\",\"question\":\"\"}\n\n输入：skip  \n输出：\n{\"is_skip\":true,\"link\":\"\",\"question\":\"\"}\n\n输入：https://maps.google.com/abc  \n输出：\n{\"is_skip\":false,\"link\":\"https://maps.google.com/abc\",\"question\":\"\"}\n\n输入：www.google.com/maps/xxx  \n输出：\n{\"is_skip\":false,\"link\":\"www.google.com/maps/xxx\",\"question\":\"\"}\n\n输入：hello  \n输出：\n{\"is_skip\":false,\"link\":\"\",\"question\":\"如果有地图链接或相关链接，请发送给我；如果没有，也可以输入“跳过”。\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1072,
+        2608
+      ],
+      "id": "24b42c60-78e2-4c91-bc54-ca78a466b661",
+      "name": "AI Agent18"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"is_skip\": true\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -928,
+        2800
+      ],
+      "id": "526384ba-018c-4f96-ad16-e01d1ed98c2c",
+      "name": "Structured Output Parser9"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c9424d26-fa5e-4b3d-bc53-f34842c8686c",
+              "leftValue": "={{ $json.output.is_skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -672,
+        2608
+      ],
+      "id": "0e1da869-c8dd-4883-b272-debc55d8bcac",
+      "name": "If5"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=language: {{ $('Select Agent ID & Language').item.json.language }}\nnext_question: 请问这次希望我们提供什么服务？",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“下一问题语言转换助手”。\n\n你的任务是：\n根据 user prompt 中提供的语言名称，将“下一条要问顾客的问题”转换成对应语言，并只输出一个 JSON 对象。\n\n你只负责语言转换，不负责判断业务逻辑，不负责补充字段，不负责改写成多个问题。\n\n【输入说明】\nuser prompt 会提供两项信息：\n1. language：目标语言名称\n2. next_question：下一条要问顾客的问题\n\n【支持语言】\n- Chinese\n- English\n- Japanese\n- Thai\n\n【处理规则】\n1. 你必须读取 user prompt 中的 language 和 next_question。\n2. 将 next_question 转换成 language 对应的语言。\n3. 保持原问题的含义不变。\n4. 保持语气自然、礼貌、简洁，像真人客服。\n5. 只输出一个问题，不要拆成多句追问。\n6. 不要补充解释，不要添加开场白，不要添加结尾说明。\n7. 如果 next_question 本身已经是目标语言，也直接原样保留或做极轻微自然化处理。\n8. 如果 language 不在支持范围内，默认保留 next_question 原文输出。\n9. 不要输出 Markdown。\n10. 不要输出代码块。\n11. 不要输出 JSON 以外的任何内容。\n\n【输出格式】\n你必须只输出以下格式的 JSON：\n\n{\n  \"follow_up\": \"string\"\n}\n\n【字段规则】\n- follow_up：\n  - 类型：string\n  - 内容必须是转换后的下一条问题\n  - 不能为空\n  - 不能包含 JSON 以外的解释文字\n\n【示例1】\n如果 user prompt 是：\nlanguage: English\nnext_question: 请问客户名称是？\n\n你必须输出：\n{\"follow_up\":\"May I have the customer name?\"}\n\n【示例2】\n如果 user prompt 是：\nlanguage: Japanese\nnext_question: 请问开始时间是几点？\n\n你必须输出：\n{\"follow_up\":\"開始時間は何時でしょうか？\"}\n\n【示例3】\n如果 user prompt 是：\nlanguage: Thai\nnext_question: 请提供更准确的服务地址，例如楼栋、楼层、房号或店号。\n\n你必须输出：\n{\"follow_up\":\"กรุณาแจ้งที่อยู่ให้ละเอียดมากขึ้น เช่น อาคาร ชั้น เลขห้อง หรือเลขที่ร้าน ได้ไหมครับ/คะ\"}\n\n【示例4】\n如果 user prompt 是：\nlanguage: Chinese\nnext_question: Please provide the contact number.\n\n你必须输出：\n{\"follow_up\":\"请提供联系电话。\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        544,
+        2544
+      ],
+      "id": "e117c0fa-a18d-4a31-91f4-daf583db00f9",
+      "name": "AI Agent19"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"follow_up\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        688,
+        2720
+      ],
+      "id": "87993414-bfc3-46ff-a941-f98257a61192",
+      "name": "Structured Output Parser10"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.follow_up }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        2544
+      ],
+      "id": "071ef09b-add5-48a8-9f2f-60d9b0ffd63c",
+      "name": "Send 5-1",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2eb99380-d1e0-42ed-b969-114a07eba8d8",
+              "leftValue": "={{ $('AI Agent18').item.json.output.link }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "21f9b92b-2042-42f2-98e9-72b15ec8cd6e",
+              "leftValue": "={{ $('AI Agent18').item.json.output.question }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -480,
+        2720
+      ],
+      "id": "31d635af-ba1d-49f9-b529-9832bb6915c0",
+      "name": "If6"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=指定语言：{{ $('Select Agent ID & Language').item.json.language }}\n用户提供的链接：{{ $('AI Agent18').item.json.output.link }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“客户信息采集子助手-5”，你只负责收集一个字段：google_map_link（地图链接）。\n\n你的任务：\n确保用户提供的链接是符合规范的\n\n你只处理这个字段，不处理其他字段。\n即使用户消息里出现了其他信息，也只提取 google_map_link 或其他地图链接相关内容。\n\n判断规则：\n1. complete：\n   - 用户提供了符合网址规范的地图链接。\n2. partial：\n   - 用户表示会发定位、发地图，但没有真正提供可用链接。\n   - 或已有链接明显不完整、不可用。给出修改建议并询问用户是否需要跳过\n3. missing：\n   - 没有提供地图链接。给出修改建议并询问用户是否需要跳过\n\n提问规则：\n1. 如果 complete，question 必须为 \"\"。\n\nnext_field_index 规则：\n1. 如果 field_status 是 complete，next_field_index = 6\n2. 如果 field_status 是 missing 或 partial，next_field_index = 5\n\n输出要求：\n1. 只输出一个 JSON 对象\n2. 不要输出解释\n3. 不要输出 JSON 以外的任何内容\n\nJSON 格式固定为：\n{\n  \"agent_index\": 5,\n  \"field_name\": \"google_map_link\",\n  \"field_status\": \"missing\",\n  \"field_value\": \"\",\n  \"question\": \"\",\n  \"next_field_index\": 5\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -288,
+        2704
+      ],
+      "id": "b73623e7-0ce5-44f7-9692-4375312512c5",
+      "name": "AI Agent5"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b9aa3ee2-850c-4301-9d99-06fd84d3523b",
+              "leftValue": "={{ $json.output.field_status }}",
+              "rightValue": "complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        2704
+      ],
+      "id": "1d925034-e37f-428f-9cc8-160df6bfce9b",
+      "name": "If7"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "current_agent_index": "={{ $json.output.next_field_index }}",
+            "google_map_link": "={{ $json.output.field_value }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        288,
+        2656
+      ],
+      "id": "236419d0-b38f-43ed-be1b-bb957bcaf129",
+      "name": "Update 4",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=memory_ {{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1072,
+        2800
+      ],
+      "id": "8381934d-71b7-4a83-b415-67d2807e9889",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        2800
+      ],
+      "id": "52236e9c-4160-4c3b-805d-1ec171be37d2",
+      "name": "Send 5-2",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -288,
+        2928
+      ],
+      "id": "3c7cb43a-304e-484c-b9aa-f76e7a3ce850",
+      "name": "Send 5-3",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "current_agent_index": "={{ $json.output.next_field_index }}",
+            "request_details": "={{ $json.output.field_value }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -576,
+        3184
+      ],
+      "id": "dbdde0c0-8cce-46d6-a6bc-0f0c7228279f",
+      "name": "Update 5",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b9aa3ee2-850c-4301-9d99-06fd84d3523b",
+              "leftValue": "={{ $json.output.field_status }}",
+              "rightValue": "complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -752,
+        3248
+      ],
+      "id": "8f1c4406-e1be-469e-a009-b0e9a5a8e992",
+      "name": "If "
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=language: {{ $('Select Agent ID & Language').item.json.language }}\nnext_question: 请问目前现场的具体情况是怎样的？",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“下一问题语言转换助手”。\n\n你的任务是：\n根据 user prompt 中提供的语言名称，将“下一条要问顾客的问题”转换成对应语言，并只输出一个 JSON 对象。\n\n你只负责语言转换，不负责判断业务逻辑，不负责补充字段，不负责改写成多个问题。\n\n【输入说明】\nuser prompt 会提供两项信息：\n1. language：目标语言名称\n2. next_question：下一条要问顾客的问题\n\n【支持语言】\n- Chinese\n- English\n- Japanese\n- Thai\n\n【处理规则】\n1. 你必须读取 user prompt 中的 language 和 next_question。\n2. 将 next_question 转换成 language 对应的语言。\n3. 保持原问题的含义不变。\n4. 保持语气自然、礼貌、简洁，像真人客服。\n5. 只输出一个问题，不要拆成多句追问。\n6. 不要补充解释，不要添加开场白，不要添加结尾说明。\n7. 如果 next_question 本身已经是目标语言，也直接原样保留或做极轻微自然化处理。\n8. 如果 language 不在支持范围内，默认保留 next_question 原文输出。\n9. 不要输出 Markdown。\n10. 不要输出代码块。\n11. 不要输出 JSON 以外的任何内容。\n\n【输出格式】\n你必须只输出以下格式的 JSON：\n\n{\n  \"follow_up\": \"string\"\n}\n\n【字段规则】\n- follow_up：\n  - 类型：string\n  - 内容必须是转换后的下一条问题\n  - 不能为空\n  - 不能包含 JSON 以外的解释文字\n\n【示例1】\n如果 user prompt 是：\nlanguage: English\nnext_question: 请问客户名称是？\n\n你必须输出：\n{\"follow_up\":\"May I have the customer name?\"}\n\n【示例2】\n如果 user prompt 是：\nlanguage: Japanese\nnext_question: 请问开始时间是几点？\n\n你必须输出：\n{\"follow_up\":\"開始時間は何時でしょうか？\"}\n\n【示例3】\n如果 user prompt 是：\nlanguage: Thai\nnext_question: 请提供更准确的服务地址，例如楼栋、楼层、房号或店号。\n\n你必须输出：\n{\"follow_up\":\"กรุณาแจ้งที่อยู่ให้ละเอียดมากขึ้น เช่น อาคาร ชั้น เลขห้อง หรือเลขที่ร้าน ได้ไหมครับ/คะ\"}\n\n【示例4】\n如果 user prompt 是：\nlanguage: Chinese\nnext_question: Please provide the contact number.\n\n你必须输出：\n{\"follow_up\":\"请提供联系电话。\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -320,
+        3184
+      ],
+      "id": "b153f61e-a601-4118-8e4e-3297b75c8e4a",
+      "name": "AI Agent21"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"follow_up\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        3344
+      ],
+      "id": "9cd0b8ec-07f0-4a32-9b0c-b5cc46407065",
+      "name": "Structured Output Parser11"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "current_agent_index": "={{ $json.output.next_field_index }}",
+            "current_condition": "={{ $json.output.field_value }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -560,
+        3584
+      ],
+      "id": "3dc7fd7e-479a-4286-83d7-b0661a1fce9a",
+      "name": "Update 6",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b9aa3ee2-850c-4301-9d99-06fd84d3523b",
+              "leftValue": "={{ $json.output.field_status }}",
+              "rightValue": "complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -752,
+        3664
+      ],
+      "id": "9640a283-6b6a-459c-a76f-36a3783a5cdc",
+      "name": "If 2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=language: {{ $('Select Agent ID & Language').item.json.language }}\nnext_question: 请问现场联系人是？",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“下一问题语言转换助手”。\n\n你的任务是：\n根据 user prompt 中提供的语言名称，将“下一条要问顾客的问题”转换成对应语言，并只输出一个 JSON 对象。\n\n你只负责语言转换，不负责判断业务逻辑，不负责补充字段，不负责改写成多个问题。\n\n【输入说明】\nuser prompt 会提供两项信息：\n1. language：目标语言名称\n2. next_question：下一条要问顾客的问题\n\n【支持语言】\n- Chinese\n- English\n- Japanese\n- Thai\n\n【处理规则】\n1. 你必须读取 user prompt 中的 language 和 next_question。\n2. 将 next_question 转换成 language 对应的语言。\n3. 保持原问题的含义不变。\n4. 保持语气自然、礼貌、简洁，像真人客服。\n5. 只输出一个问题，不要拆成多句追问。\n6. 不要补充解释，不要添加开场白，不要添加结尾说明。\n7. 如果 next_question 本身已经是目标语言，也直接原样保留或做极轻微自然化处理。\n8. 如果 language 不在支持范围内，默认保留 next_question 原文输出。\n9. 不要输出 Markdown。\n10. 不要输出代码块。\n11. 不要输出 JSON 以外的任何内容。\n\n【输出格式】\n你必须只输出以下格式的 JSON：\n\n{\n  \"follow_up\": \"string\"\n}\n\n【字段规则】\n- follow_up：\n  - 类型：string\n  - 内容必须是转换后的下一条问题\n  - 不能为空\n  - 不能包含 JSON 以外的解释文字\n\n【示例1】\n如果 user prompt 是：\nlanguage: English\nnext_question: 请问客户名称是？\n\n你必须输出：\n{\"follow_up\":\"May I have the customer name?\"}\n\n【示例2】\n如果 user prompt 是：\nlanguage: Japanese\nnext_question: 请问开始时间是几点？\n\n你必须输出：\n{\"follow_up\":\"開始時間は何時でしょうか？\"}\n\n【示例3】\n如果 user prompt 是：\nlanguage: Thai\nnext_question: 请提供更准确的服务地址，例如楼栋、楼层、房号或店号。\n\n你必须输出：\n{\"follow_up\":\"กรุณาแจ้งที่อยู่ให้ละเอียดมากขึ้น เช่น อาคาร ชั้น เลขห้อง หรือเลขที่ร้าน ได้ไหมครับ/คะ\"}\n\n【示例4】\n如果 user prompt 是：\nlanguage: Chinese\nnext_question: Please provide the contact number.\n\n你必须输出：\n{\"follow_up\":\"请提供联系电话。\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -304,
+        3584
+      ],
+      "id": "b1eae51c-60a2-41dd-a1e2-4d785644f257",
+      "name": "AI Agent22"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"follow_up\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        3760
+      ],
+      "id": "7d675b7a-9f0f-4c89-aca3-2231ac6959d3",
+      "name": "Structured Output Parser12"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "current_agent_index": "={{ $json.output.next_field_index }}",
+            "contact_person": "={{ $json.output.field_value }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -576,
+        4032
+      ],
+      "id": "1810f930-b28a-4219-8b19-b79883743a67",
+      "name": "Update 7",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b9aa3ee2-850c-4301-9d99-06fd84d3523b",
+              "leftValue": "={{ $json.output.field_status }}",
+              "rightValue": "complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -768,
+        4112
+      ],
+      "id": "0bf7e037-f54e-477a-aded-c66ac810381b",
+      "name": "If 3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=language: {{ $('Select Agent ID & Language').item.json.language }}\nnext_question: 请问联系电话是？",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“下一问题语言转换助手”。\n\n你的任务是：\n根据 user prompt 中提供的语言名称，将“下一条要问顾客的问题”转换成对应语言，并只输出一个 JSON 对象。\n\n你只负责语言转换，不负责判断业务逻辑，不负责补充字段，不负责改写成多个问题。\n\n【输入说明】\nuser prompt 会提供两项信息：\n1. language：目标语言名称\n2. next_question：下一条要问顾客的问题\n\n【支持语言】\n- Chinese\n- English\n- Japanese\n- Thai\n\n【处理规则】\n1. 你必须读取 user prompt 中的 language 和 next_question。\n2. 将 next_question 转换成 language 对应的语言。\n3. 保持原问题的含义不变。\n4. 保持语气自然、礼貌、简洁，像真人客服。\n5. 只输出一个问题，不要拆成多句追问。\n6. 不要补充解释，不要添加开场白，不要添加结尾说明。\n7. 如果 next_question 本身已经是目标语言，也直接原样保留或做极轻微自然化处理。\n8. 如果 language 不在支持范围内，默认保留 next_question 原文输出。\n9. 不要输出 Markdown。\n10. 不要输出代码块。\n11. 不要输出 JSON 以外的任何内容。\n\n【输出格式】\n你必须只输出以下格式的 JSON：\n\n{\n  \"follow_up\": \"string\"\n}\n\n【字段规则】\n- follow_up：\n  - 类型：string\n  - 内容必须是转换后的下一条问题\n  - 不能为空\n  - 不能包含 JSON 以外的解释文字\n\n【示例1】\n如果 user prompt 是：\nlanguage: English\nnext_question: 请问客户名称是？\n\n你必须输出：\n{\"follow_up\":\"May I have the customer name?\"}\n\n【示例2】\n如果 user prompt 是：\nlanguage: Japanese\nnext_question: 请问开始时间是几点？\n\n你必须输出：\n{\"follow_up\":\"開始時間は何時でしょうか？\"}\n\n【示例3】\n如果 user prompt 是：\nlanguage: Thai\nnext_question: 请提供更准确的服务地址，例如楼栋、楼层、房号或店号。\n\n你必须输出：\n{\"follow_up\":\"กรุณาแจ้งที่อยู่ให้ละเอียดมากขึ้น เช่น อาคาร ชั้น เลขห้อง หรือเลขที่ร้าน ได้ไหมครับ/คะ\"}\n\n【示例4】\n如果 user prompt 是：\nlanguage: Chinese\nnext_question: Please provide the contact number.\n\n你必须输出：\n{\"follow_up\":\"请提供联系电话。\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -320,
+        4032
+      ],
+      "id": "0e699be8-5dfc-44f6-90f3-74805ebaf694",
+      "name": "AI Agent23"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"follow_up\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -176,
+        4208
+      ],
+      "id": "e85f61e1-b3ad-4f4c-a204-44726921e773",
+      "name": "Structured Output Parser13"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "current_agent_index": "={{ $('AI Agent9').item.json.output.next_field_index }}",
+            "contact_number": "={{ $('AI Agent9').item.json.output.field_value }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -560,
+        4400
+      ],
+      "id": "caf51af0-cfb2-43e9-9329-41330d6d2b37",
+      "name": "Update 8",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b9aa3ee2-850c-4301-9d99-06fd84d3523b",
+              "leftValue": "={{ $json.output.field_status }}",
+              "rightValue": "complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -752,
+        4480
+      ],
+      "id": "45ef2664-fe9b-436e-a331-860d4996175a",
+      "name": "If 4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=language: {{ $('Select Agent ID & Language').item.json.language }}\nnext_question: 信息收集完成，谢谢配合。",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "你是“下一问题语言转换助手”。\n\n你的任务是：\n根据 user prompt 中提供的语言名称，将“下一条要问顾客的问题”转换成对应语言，并只输出一个 JSON 对象。\n\n你只负责语言转换，不负责判断业务逻辑，不负责补充字段，不负责改写成多个问题。\n\n【输入说明】\nuser prompt 会提供两项信息：\n1. language：目标语言名称\n2. next_question：下一条要问顾客的问题\n\n【支持语言】\n- Chinese\n- English\n- Japanese\n- Thai\n\n【处理规则】\n1. 你必须读取 user prompt 中的 language 和 next_question。\n2. 将 next_question 转换成 language 对应的语言。\n3. 保持原问题的含义不变。\n4. 保持语气自然、礼貌、简洁，像真人客服。\n5. 只输出一个问题，不要拆成多句追问。\n6. 不要补充解释，不要添加开场白，不要添加结尾说明。\n7. 如果 next_question 本身已经是目标语言，也直接原样保留或做极轻微自然化处理。\n8. 如果 language 不在支持范围内，默认保留 next_question 原文输出。\n9. 不要输出 Markdown。\n10. 不要输出代码块。\n11. 不要输出 JSON 以外的任何内容。\n\n【输出格式】\n你必须只输出以下格式的 JSON：\n\n{\n  \"follow_up\": \"string\"\n}\n\n【字段规则】\n- follow_up：\n  - 类型：string\n  - 内容必须是转换后的下一条问题\n  - 不能为空\n  - 不能包含 JSON 以外的解释文字\n\n【示例1】\n如果 user prompt 是：\nlanguage: English\nnext_question: 请问客户名称是？\n\n你必须输出：\n{\"follow_up\":\"May I have the customer name?\"}\n\n【示例2】\n如果 user prompt 是：\nlanguage: Japanese\nnext_question: 请问开始时间是几点？\n\n你必须输出：\n{\"follow_up\":\"開始時間は何時でしょうか？\"}\n\n【示例3】\n如果 user prompt 是：\nlanguage: Thai\nnext_question: 请提供更准确的服务地址，例如楼栋、楼层、房号或店号。\n\n你必须输出：\n{\"follow_up\":\"กรุณาแจ้งที่อยู่ให้ละเอียดมากขึ้น เช่น อาคาร ชั้น เลขห้อง หรือเลขที่ร้าน ได้ไหมครับ/คะ\"}\n\n【示例4】\n如果 user prompt 是：\nlanguage: Chinese\nnext_question: Please provide the contact number.\n\n你必须输出：\n{\"follow_up\":\"请提供联系电话。\"}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -304,
+        4400
+      ],
+      "id": "7d9b15fe-d861-43c9-840a-c2f8ba3da8fa",
+      "name": "AI Agent24"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"follow_up\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -160,
+        4592
+      ],
+      "id": "d88faf62-7849-41d9-a85e-dc99e320cd28",
+      "name": "Structured Output Parser14"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.follow_up }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        3184
+      ],
+      "id": "0d95dc2b-8e00-4e39-a137-726aa3dae4b4",
+      "name": "Send 6-1",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $('AI Agent6').item.json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -576,
+        3344
+      ],
+      "id": "0d1e87da-d120-4f46-b15b-5ed497623254",
+      "name": "Send 6-2",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.follow_up }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        3584
+      ],
+      "id": "e598cd93-f36c-4db8-b70b-f4a3e9fedb71",
+      "name": "Send 7-1",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $('AI Agent7').item.json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -560,
+        3728
+      ],
+      "id": "3ff71b67-882a-42a9-9c31-c4e229cf2f5e",
+      "name": "Send 7-2",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.follow_up }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        4032
+      ],
+      "id": "2f8c893a-ce19-4ad1-81da-9c62fd9c056e",
+      "name": "Send 8-1",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $('AI Agent8').item.json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -576,
+        4208
+      ],
+      "id": "6e127ef4-09af-4935-a292-729dda2ae6c0",
+      "name": "Send 8-2",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output.follow_up }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        4400
+      ],
+      "id": "1ba52860-bf93-49c8-85f0-71754ebd61d9",
+      "name": "Send 9-1",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $('AI Agent9').item.json.output.question }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -560,
+        4592
+      ],
+      "id": "aa77a73f-5034-416a-90bc-072e273449d3",
+      "name": "Send 9-2",
+      "webhookId": "f33e330c-95ce-4272-9f3f-a3d00ac9d164",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "ziaa27HDllIJ6RxA",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://form-filler:8000/fill/maintenance-form/from-record",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"record_id\": 1,\n  \"table_name\": \"{{ $('Table Name').item.json['Table Name'] }}\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        256,
+        4400
+      ],
+      "id": "fb2abb7f-deb5-49cf-a6c9-32784be48f29",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "sendTo": "DSC2409007@xmu.edu.my",
+        "subject": "Maintenance",
+        "message": "123456",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        480,
+        4400
+      ],
+      "id": "dcd3a608-9291-4974-bcd9-a434aa394973",
+      "name": "Send a message",
+      "webhookId": "77d9ea84-894c-4422-9043-35495817a71c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZNdGFAbD9H0o4Add",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ $('Table Name').item.json['Table Name'] }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 1,
+            "current_agent_index": 6
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_start",
+              "displayName": "appointment_start",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "appointment_end",
+              "displayName": "appointment_end",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "service_address",
+              "displayName": "service_address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "google_map_link",
+              "displayName": "google_map_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "request_details",
+              "displayName": "request_details",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_condition",
+              "displayName": "current_condition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_person",
+              "displayName": "contact_person",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "contact_number",
+              "displayName": "contact_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "current_agent_index",
+              "displayName": "current_agent_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_confirmed",
+              "displayName": "is_confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1104,
+        2544
+      ],
+      "id": "ec5a3eb0-ea7a-4bb5-9edb-bf9d2e23ac23",
+      "name": "Update 9",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c53cd9f9-77c1-4331-98ff-bfc9bdf95a3c",
+              "name": "Table Name",
+              "type": "string",
+              "value": "=n8n_info_record_{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4de8ca61-ad5a-4509-96bf-45a5ba752d65",
+      "name": "Table Name",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -1328,
+        0
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9543786a-7137-424a-8216-9abcc560f8e0",
+              "leftValue": "={{ $json.table_exists }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -816,
+        0
+      ],
+      "id": "5eff7bc4-45ef-424c-99f1-56100c2802d7",
+      "name": "If8"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT EXISTS (\n  SELECT 1\n  FROM information_schema.tables\n  WHERE table_schema = 'public'\n  AND table_name = 'n8n_info_record_{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}'\n) AS table_exists;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1072,
+        0
+      ],
+      "id": "27a69e92-b16d-4422-8cd9-b84e207db5ba",
+      "name": "If_table_exist",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "CREATE TABLE n8n_info_record_{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }} (\n    id BIGSERIAL PRIMARY KEY,\n    language VARCHAR(50),\n    customer_name VARCHAR(255),\n    appointment_start TIMESTAMP,\n    appointment_end TIMESTAMP,\n    service_address TEXT,\n    google_map_link TEXT,\n    request_details TEXT,\n    current_condition TEXT,\n    contact_person VARCHAR(100),\n    contact_number VARCHAR(50),\n    current_agent_index SMALLINT DEFAULT 1,\n    is_confirmed BOOLEAN DEFAULT FALSE,\n\n    CONSTRAINT chk_appointment_time\n        CHECK (appointment_end > appointment_start),\n\n    CONSTRAINT chk_current_agent_index\n        CHECK (current_agent_index BETWEEN 0 AND 9)\n);\n\nINSERT INTO n8n_info_record_{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }} (current_agent_index, is_confirmed)\nVALUES (1, FALSE);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -1584,
+        432
+      ],
+      "id": "745deaa2-1fab-4f8f-a8ce-d3e923083e62",
+      "name": "Create Info Record",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "feb1a0ea-08d5-4b82-8e05-a1bb2f04b8ce",
+              "leftValue": "={{ $json.language_is_null }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -336,
+        -16
+      ],
+      "id": "22ab49f0-8963-4200-b4d3-64c27f01acfe",
+      "name": "If9"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT EXISTS (\n    SELECT 1\n    FROM {{ $('Table Name').item.json['Table Name'] }}\n    WHERE language IS NULL\n) AS language_is_null;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -560,
+        -16
+      ],
+      "id": "3710df73-9a83-4ada-9412-bfc4cb8a5d72",
+      "name": "language_is_null",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_chat_histories",
+          "mode": "list",
+          "cachedResultName": "n8n_chat_histories"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -3024,
+        16
+      ],
+      "id": "99aadea6-2fd1-4d97-b1ce-49b970e525b0",
+      "name": "Reset Chat Histories1",
+      "credentials": {
+        "postgres": {
+          "id": "oKNXUpa5hdHmzshX",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Reset chat history",
+        "height": 288,
+        "width": 432,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3184,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "6a080a45-e032-41db-b680-058f61c4e0e4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Determine whether this round of dialogue is the first one\nIf true, create a state machine; otherwise, proceed directly to the branching logic.",
+        "height": 400,
+        "width": 1552,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1664,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "5808b4cc-1cd7-4410-bee3-ae83f9978d82",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Say hi to user",
+        "height": 624,
+        "width": 1936,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1664,
+        288
+      ],
+      "typeVersion": 1,
+      "id": "fd831d3f-992d-45d2-94f4-f0285175023c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Collect and validate user-provided data\n",
+        "height": 576,
+        "width": 480,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1664,
+        944
+      ],
+      "typeVersion": 1,
+      "id": "0440d49e-5d1e-4cee-ba54-523e8a78a551",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Once the data has been collected, proceed with the translation and form-filling steps then clear the chat history",
+        "height": 464,
+        "width": 720,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        192,
+        4192
+      ],
+      "typeVersion": 1,
+      "id": "66e34dde-7f43-4d7d-8338-7cdd10e9d89f",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Customer's name"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        1008
+      ],
+      "typeVersion": 1,
+      "id": "f60aa530-a879-41f1-9998-7040c040f8ca",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Request details"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        3232
+      ],
+      "typeVersion": 1,
+      "id": "f57bc3dd-9d7d-49ae-abf3-797887ff090a",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## appointment end date & time"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        1680
+      ],
+      "typeVersion": 1,
+      "id": "58de3240-20e8-47a9-b14c-a47f5f3612e6",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## appointment start  date & time"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        1280
+      ],
+      "typeVersion": 1,
+      "id": "917f8fd8-813a-42d1-8e22-396f1d1529a5",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Current_condition"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        3616
+      ],
+      "typeVersion": 1,
+      "id": "61b6664e-a6c9-47ba-8735-f078a9975a67",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Service address"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        2128
+      ],
+      "typeVersion": 1,
+      "id": "8f6e9607-3ead-4bd6-9fb8-ef7c93798d0b",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Contact person"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        4080
+      ],
+      "typeVersion": 1,
+      "id": "e7f49d70-7f3d-4f0d-9af7-38345d95d7df",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Google map link"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        2688
+      ],
+      "typeVersion": 1,
+      "id": "fbb70c48-7d1f-4e72-a97f-f1fbc4164f57",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Contact number"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        4432
+      ],
+      "typeVersion": 1,
+      "id": "7e3ecec0-0915-47e2-b5ca-4f36387f66df",
+      "name": "Sticky Note13"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Input type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text": {
+      "main": [
+        [
+          {
+            "node": "Table Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Input type": {
+      "main": [
+        [
+          {
+            "node": "Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Language Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Ask_Language",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update rows in a table1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is_First_Session": {
+      "main": [
+        [
+          {
+            "node": "Welcome Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send_Welcome": {
+      "main": [
+        []
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Welcome Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Language Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Welcome Agent": {
+      "main": [
+        [
+          {
+            "node": "Send_Welcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Welcome Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reset Chat Histories": {
+      "main": [
+        []
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Select Start Time",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent18",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent6",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent7",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent8",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent9",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent12",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent16",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent14",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent13",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent18",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent5",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent17",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent15",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent10",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent19",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent21",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent22",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent23",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "AI Agent24",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI Agent9",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI Agent2",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI Agent8",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI Agent7",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI Agent6",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI Agent14",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI Agent13",
+            "type": "ai_outputParser",
+            "index": 0
+          },
+          {
+            "node": "AI Agent5",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update rows in a table1": {
+      "main": [
+        [
+          {
+            "node": "is_First_Session",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Select Agent ID & Language",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "If 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Agent ID & Language": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update 1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Update 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 2-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update 2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If 1": {
+      "main": [
+        [
+          {
+            "node": "Update 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 1-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "AI Agent11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Language Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send 1-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent10": {
+      "main": [
+        [
+          {
+            "node": "Send 2-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent10",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent11",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent11": {
+      "main": [
+        [
+          {
+            "node": "AI Agent12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser5": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent12",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent12": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 2-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Start Time": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent14": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Update ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 3-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update ": {
+      "main": [
+        [
+          {
+            "node": "AI Agent15",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent15": {
+      "main": [
+        [
+          {
+            "node": "Send 3-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser6": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent15",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent16": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser7": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent16",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent14",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 3-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent14",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent9",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent8",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent7",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent6",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent4",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent2",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent5",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent4": {
+      "main": [
+        [
+          {
+            "node": "AI Agent13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If4": {
+      "main": [
+        [
+          {
+            "node": "Update 3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 4-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update 3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent17",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent17": {
+      "main": [
+        [
+          {
+            "node": "Send 4-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser8": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent17",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent13": {
+      "main": [
+        [
+          {
+            "node": "If4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent18": {
+      "main": [
+        [
+          {
+            "node": "If5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser9": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent18",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If5": {
+      "main": [
+        [
+          {
+            "node": "AI Agent19",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent19": {
+      "main": [
+        [
+          {
+            "node": "Send 5-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser10": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent19",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If6": {
+      "main": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 5-3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If7": {
+      "main": [
+        [
+          {
+            "node": "Update 4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 5-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent5": {
+      "main": [
+        [
+          {
+            "node": "If7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent18",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update 4": {
+      "main": [
+        [
+          {
+            "node": "AI Agent19",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update 5": {
+      "main": [
+        [
+          {
+            "node": "AI Agent21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If ": {
+      "main": [
+        [
+          {
+            "node": "Update 5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 6-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent21": {
+      "main": [
+        [
+          {
+            "node": "Send 6-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser11": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent21",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent6": {
+      "main": [
+        [
+          {
+            "node": "If ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update 6": {
+      "main": [
+        [
+          {
+            "node": "AI Agent22",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If 2": {
+      "main": [
+        [
+          {
+            "node": "Update 6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 7-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent22": {
+      "main": [
+        [
+          {
+            "node": "Send 7-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser12": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent22",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent7": {
+      "main": [
+        [
+          {
+            "node": "If 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update 7": {
+      "main": [
+        [
+          {
+            "node": "AI Agent23",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If 3": {
+      "main": [
+        [
+          {
+            "node": "Update 7",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 8-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent23": {
+      "main": [
+        [
+          {
+            "node": "Send 8-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser13": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent23",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent8": {
+      "main": [
+        [
+          {
+            "node": "If 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update 8": {
+      "main": [
+        [
+          {
+            "node": "AI Agent24",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If 4": {
+      "main": [
+        [
+          {
+            "node": "Update 8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send 9-2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent24": {
+      "main": [
+        [
+          {
+            "node": "Send 9-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser14": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent24",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent9": {
+      "main": [
+        [
+          {
+            "node": "If 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send 9-1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Reset Chat Histories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send 5-1": {
+      "main": [
+        [
+          {
+            "node": "Update 9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Table Name": {
+      "main": [
+        [
+          {
+            "node": "If_table_exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If_table_exist": {
+      "main": [
+        [
+          {
+            "node": "If8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If8": {
+      "main": [
+        [
+          {
+            "node": "language_is_null",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Info Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Info Record": {
+      "main": [
+        [
+          {
+            "node": "Language Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "language_is_null": {
+      "main": [
+        [
+          {
+            "node": "If9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If9": {
+      "main": [
+        [
+          {
+            "node": "Language Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Select Agent ID & Language",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6598d3aa-2397-4574-bbf7-dc3afe6338c9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "94ac8dfec8e6eaf8477cb144c2f0c75f6a8c99bea34644b3b32cdc96ac75cc45"
+  },
+  "id": "0ibYO5WK79yUFGpi",
+  "tags": []
+}

@@ -1,0 +1,69 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Kuala_Lumpur
+      - N8N_HOST=${DOMAIN}
+      - N8N_PROTOCOL=https
+      - N8N_PORT=5678
+      - N8N_LISTEN_ADDRESS=0.0.0.0
+      - N8N_SECURE_COOKIE=true
+      - WEBHOOK_URL=https://${DOMAIN}/
+      - N8N_PROXY_HOPS=1
+      - N8N_EDITOR_BASE_URL=https://${DOMAIN}/
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+      - ./n8n/imports:/imports:ro
+
+  form-filler:
+    build:
+      context: ./form-filler
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Kuala_Lumpur
+      - TEMPLATE_PATH=/templates/Support Request Form.xlsx
+      - SHEET_NAME=Sheet1
+      - MAINTENANCE_TEMPLATE_PATH=/templates/template.xlsx
+      - MAINTENANCE_SHEET_NAME=Sheet1
+      - OUTPUT_DIR=/outputs
+      - FORM_TIMEZONE=Asia/Kuala_Lumpur
+      - POSTGRES_HOST=host.docker.internal
+      - POSTGRES_PORT=5432
+      - POSTGRES_TABLE=n8n_info_record
+      - POSTGRES_DATABASE=${FORM_FILLER_POSTGRES_DATABASE:-}
+      - POSTGRES_USER=${FORM_FILLER_POSTGRES_USER:-}
+      - POSTGRES_PASSWORD=${FORM_FILLER_POSTGRES_PASSWORD:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - DEEPSEEK_BASE_URL=${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      - DEEPSEEK_MODEL=${DEEPSEEK_MODEL:-deepseek-chat}
+      - REPORT_ALLOWED_TABLES=${REPORT_ALLOWED_TABLES:-info_record,n8n_info_record}
+      - REPORT_DEFAULT_TABLE=${REPORT_DEFAULT_TABLE:-info_record}
+    volumes:
+      - ./Support Request Form.xlsx:/templates/Support Request Form.xlsx:ro
+      - ./template.xlsx:/templates/template.xlsx:ro
+      - ./generated_forms:/outputs
+    expose:
+      - "8000"
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    volumes:
+      - ollama:/root/.ollama
+    expose:
+      - "11434"
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CF_TUNNEL_TOKEN}
+    depends_on:
+      - n8n
+      - form-filler
+
+volumes:
+  ollama:

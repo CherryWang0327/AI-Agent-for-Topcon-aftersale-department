@@ -1,0 +1,4 @@
+__pycache__/
+report-ui/node_modules/
+report-ui/dist/
+*.pyc

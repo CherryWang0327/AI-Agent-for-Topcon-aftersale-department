@@ -1,0 +1,8 @@
+services:
+  n8n:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  form-filler:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
