@@ -1,326 +1,216 @@
-# MetaAgents Instructor Setup Guide
+# Agentic AI for After-Sales Operations Automation
 
-## Notice
+[中文](#中文) · [English](#english)
 
-- Due to data transfer uncertainty and legal risk, this public delivery package does not include any real keys, tokens, passwords, OAuth tokens, or directly importable private credential files.
-- If the configuration becomes too troublesome, you may contact `DSC2409007@xmu.edu.my` to request the test keys or tokens.
-- This assignment only involves two n8n workflows: `v1` and `gmail`.
-- These two workflows reuse the same Cloudflare, Gmail, and WhatsApp external accounts. Before testing, make sure any other machine running the same `cloudflared`, n8n, or Gmail polling instance has been stopped. Otherwise, webhooks may hit the wrong machine or both machines may process the same events.
-- If you want a separate step-by-step guide for Cloudflare Tunnel and WhatsApp credential setup, open `MetaAgents/cloudflare-whatsapp-setup.md`.
-- Click the link below to watch the demo video:
-[Demo Video](https://drive.google.com/file/d/1L7uPLcH5mKdh2V2x3o61UY1G9G_okShg/view?usp=sharing)
+> An Agentic AI workflow for cross-border after-sales operations. It connects customer requests, structured records, multilingual maintenance forms, approval-oriented email loops, and operational reporting into one auditable process.
 
-All commands below are assumed to be run from the directory that contains the `MetaAgents` folder.
+> 面向跨境售后运营的 Agentic AI 自动化工作流。项目将客户请求、结构化记录、多语言维护表单、邮件确认闭环和运营分析整合为一条可追溯流程。
 
-## 1. Check the Public Delivery Package First
+| Input | Automation layer | Outcome |
+|---|---|---|
+| WhatsApp requests and email attachments | n8n workflows, FastAPI service, PostgreSQL, Ollama / DeepSeek | Structured records, multilingual workbooks, confirmation loop, and reports |
 
-Please confirm that the following items exist:
-
-- `MetaAgents/.env`
-- `MetaAgents/cloudflare-whatsapp-setup.md`
-- `MetaAgents/docker-compose.yml`
-- `MetaAgents/docker-compose.override.yml`
-- `MetaAgents/postgres/info_record.sql`
-- `MetaAgents/n8n/imports/v1.json`
-- `MetaAgents/n8n/imports/gmail.json`
-- `MetaAgents/n8n/credentials/README.md`
-- `MetaAgents/n8n/credentials/credential-setup.md`
-- `MetaAgents/generated_forms`
-- `MetaAgents/Support Request Form.xlsx`
-- `MetaAgents/template.xlsx`
-
-Run the integrity check once before doing anything else:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File MetaAgents/scripts/check-metaagents.ps1
+```mermaid
+flowchart LR
+    A[Customer request] --> B[WhatsApp / n8n workflow]
+    B --> C[Structured service record]
+    C --> D[Form-filler service]
+    D --> E[Multilingual maintenance workbook]
+    E --> F[Email review and confirmation]
+    F --> G[PostgreSQL record update]
+    G --> H[Operational analysis report]
 ```
 
-## 2. Install the Base Environment
+> **Security boundary:** This public repository intentionally excludes real tokens, API keys, OAuth credentials, and private configuration files. Use your own credentials and follow the setup documentation before deployment.
 
-Install these three items on the target machine first:
+---
 
-1. Docker Desktop
-2. PostgreSQL
-3. Any web browser
+## 中文
 
-Start Docker Desktop first, then start the PostgreSQL service, and only then continue with the remaining steps.
+### 项目简介
 
-## 3. Fill in `MetaAgents/.env`
+跨境售后运营常面临客户沟通渠道分散、表单依赖邮件往返、信息重复录入和审批状态难以追踪等问题。本项目以 **Agentic AI + 工作流自动化** 为核心，将客户服务请求转化为结构化记录，并自动生成多语言维护表单，支持邮件回传确认、数据库同步以及面向管理者的运营分析。
 
-Open `MetaAgents/.env` and fill in each field.
+项目的目标不是替代人工判断，而是减少重复性信息搬运，让售后团队能够更快地完成信息收集、表单流转与后续跟进。
 
-- `CF_TUNNEL_TOKEN`
-  This is the Cloudflare Zero Trust Tunnel runtime token. It must belong to the Tunnel you actually want to run on this machine.
-- `N8N_ENCRYPTION_KEY`
-  If you plan to create n8n credentials manually, you can fill in any fixed random string here. A length of at least 32 characters is recommended.
-  If you later receive the private add-on package and want to import credential JSON files directly, this value must exactly match the value provided in the private package. Otherwise, n8n will not be able to read the imported credentials correctly.
-- `DOMAIN`
-  The default value is `n8n.metagents6.xyz`. If you want to use your own domain, change it here and make sure the Cloudflare public hostname for n8n is changed to the same domain.
-- `FORM_FILLER_POSTGRES_DATABASE`
-  The default value used by this project is `postgres`.
-- `FORM_FILLER_POSTGRES_USER`
-  The default value used by this project is `postgres`.
-- `FORM_FILLER_POSTGRES_PASSWORD`
-  Fill in the actual PostgreSQL password you want to use on the machine. The database login and the n8n `Postgres account` credential must use the same password.
-- `DEEPSEEK_BASE_URL`
-  Keep `https://api.deepseek.com` unless you intentionally use another compatible endpoint.
-- `DEEPSEEK_MODEL`
-  Keep `deepseek-chat` unless you intentionally use another compatible model.
-- `DEEPSEEK_API_KEY`
-  Fill in your own DeepSeek API key. The translation and report analysis features in `form-filler` depend on it.
+### 端到端流程
 
-This public package no longer gives any real values directly. If you do not want to prepare these settings manually, contact `DSC2409007@xmu.edu.my` for the private add-on package.
-
-## 4. Configure PostgreSQL
-
-The simplest approach is to keep using the local `postgres` database and make sure the password of the `postgres` user matches `FORM_FILLER_POSTGRES_PASSWORD` in `MetaAgents/.env`.
-
-If you keep the default `postgres` user, you can run this in PostgreSQL:
-
-```sql
-ALTER USER postgres WITH PASSWORD '<YOUR_POSTGRES_PASSWORD>';
+```mermaid
+flowchart TD
+    A[客户通过 WhatsApp 发起服务请求] --> B[n8n 接收与解析]
+    B --> C[生成并保存结构化记录]
+    C --> D[FastAPI 填充维护表单]
+    D --> E[Ollama 生成多语言内容]
+    E --> F[邮件发送 Excel 表单]
+    F --> G{邮件主题为 confirm?}
+    G -->|否| H[更新并返回修订后的表单]
+    G -->|是| I[写入正式信息表并关闭本次流转]
+    I --> J[报告界面与运营分析]
 ```
 
-If you want to use a different database name or user name, that is also acceptable, but you must update both of the following accordingly:
+### 主要能力
 
-- `MetaAgents/.env`
-- The n8n `Postgres account` credential
+- **多渠道请求接入**：通过 n8n 工作流接收 WhatsApp 消息与邮件附件。
+- **结构化信息管理**：使用 PostgreSQL 保存服务记录，降低手工重复录入。
+- **多语言维护表单**：自动生成 Excel 维护表单，并支持英文、日文、泰文内容处理。
+- **邮件确认闭环**：通过邮件附件回传和 `confirm` 分支完成记录更新与流程收口。
+- **运营报告**：FastAPI 服务提供表格数据分析与浏览器端报告界面。
+- **可部署架构**：以 Docker Compose 组织 n8n、form-filler、Ollama 和 Cloudflare Tunnel。
 
-Then run this SQL file:
+### 我的贡献
 
-```powershell
-psql -U postgres -d postgres -f MetaAgents/postgres/info_record.sql
+- 参与调研 Topcon 售后服务场景中的沟通成本与表单流转问题。
+- 设计 Agentic AI 驱动的闭环工作流，实现从信息收集到多级审批流转的自动化思路。
+- 整合 n8n、PostgreSQL、FastAPI、Excel 模板及邮件流程，构建可追溯的服务记录链路。
+- 实现多语言表单生成与邮件回传同步逻辑，并支持结构化运营分析输出。
+
+### 系统架构
+
+```mermaid
+flowchart TB
+    subgraph Automation[Workflow automation]
+        W[WhatsApp workflow]
+        M[Gmail workflow]
+        N[n8n]
+    end
+    subgraph Services[Application services]
+        F[FastAPI form-filler]
+        O[Ollama translation]
+        R[Report UI]
+    end
+    subgraph Data[Data layer]
+        P[(PostgreSQL)]
+        X[Excel templates and generated forms]
+    end
+    W --> N --> F
+    M --> N
+    F <--> P
+    F <--> X
+    F --> O
+    F --> R
 ```
 
-`v1` will automatically create the matching `n8n_info_record_<phone_number>` source table the first time it receives a WhatsApp message, so you do not need to import any fixed source-table SQL manually.
+### 技术栈
 
-If you prefer pgAdmin, you can also open `MetaAgents/postgres/info_record.sql` directly and execute it there.
+`n8n` · `FastAPI` · `PostgreSQL` · `Docker Compose` · `Ollama` · `DeepSeek API` · `Cloudflare Tunnel` · `WhatsApp Cloud API` · `Gmail` · `Excel`
 
-## 5. Start the Docker Services
+### 仓库导航
 
-Enter the `MetaAgents` directory and start the containers:
+| 目录 / 文件 | 说明 |
+|---|---|
+| `n8n/imports/` | WhatsApp 与 Gmail 工作流定义 |
+| `form-filler/` | 表单生成、回传同步与报告服务 |
+| `postgres/info_record.sql` | 记录表初始化脚本 |
+| `docker-compose.yml` | 本地服务编排 |
+| `n8n/credentials/credential-setup.md` | 凭据配置说明 |
+| `cloudflare-whatsapp-setup.md` | Cloudflare Tunnel 与 WhatsApp 配置说明 |
 
-```powershell
-cd MetaAgents
-docker compose up -d --build
-cd ..
+### 快速开始
+
+1. 复制并填写 `.env`，使用自己的密钥、数据库密码和域名。
+2. 初始化 PostgreSQL，并执行 `postgres/info_record.sql`。
+3. 运行 `docker compose up -d --build` 启动服务。
+4. 导入 `n8n/imports/v1.json` 与 `n8n/imports/gmail.json`。
+5. 在 n8n 中创建并绑定所需的 WhatsApp、Gmail、Postgres 与 Ollama 凭据。
+
+详细流程请参阅 [`n8n/credentials/credential-setup.md`](n8n/credentials/credential-setup.md)、[`cloudflare-whatsapp-setup.md`](cloudflare-whatsapp-setup.md) 和 [`form-filler/README.md`](form-filler/README.md)。
+
+---
+
+## English
+
+### Overview
+
+Cross-border after-sales teams often work across fragmented customer channels, email-based forms, repeated data entry, and difficult-to-track approvals. This project uses **Agentic AI and workflow automation** to turn service requests into structured records, generate multilingual maintenance forms, support email confirmation, synchronize data, and produce operational reports.
+
+The goal is not to replace human judgment. It reduces repetitive information transfer so service teams can focus on review, coordination, and follow-up.
+
+### End-to-end flow
+
+```mermaid
+flowchart TD
+    A[Customer submits a WhatsApp request] --> B[n8n receives and parses it]
+    B --> C[Create and store a structured record]
+    C --> D[FastAPI fills the maintenance form]
+    D --> E[Ollama produces multilingual content]
+    E --> F[Send the Excel workbook by email]
+    F --> G{Email subject is confirm?}
+    G -->|No| H[Update and return the revised workbook]
+    G -->|Yes| I[Write to the final record and close the loop]
+    I --> J[Report UI and operations analysis]
 ```
 
-This starts four services:
+### Key capabilities
 
-1. `n8n`
-2. `form-filler`
-3. `ollama`
-4. `cloudflared`
+- **Multi-channel intake** through n8n workflows for WhatsApp messages and email attachments.
+- **Structured record management** with PostgreSQL to reduce duplicate manual entry.
+- **Multilingual maintenance workbooks** with English, Japanese, and Thai content handling.
+- **Email confirmation loop** using returned attachments and a `confirm` branch.
+- **Operational reporting** through FastAPI-backed data analysis and a browser report workspace.
+- **Deployable service composition** with Docker Compose, n8n, form-filler, Ollama, and Cloudflare Tunnel.
 
-These two files are used automatically:
+### My contribution
 
-- `MetaAgents/docker-compose.yml`
-- `MetaAgents/docker-compose.override.yml`
+- Researched communication and form-circulation pain points in Topcon after-sales operations.
+- Designed an Agentic AI closed-loop workflow from information collection through approval routing.
+- Integrated n8n, PostgreSQL, FastAPI, Excel templates, and email into a traceable service-record flow.
+- Implemented multilingual form generation, email reply synchronization, and structured operational-report output.
 
-Important notes:
+### Architecture
 
-- `MetaAgents/n8n_data` will become the new local n8n data directory on the target machine
-- `MetaAgents/n8n/imports` is mounted into the n8n container as read-only so the workflow JSON files can be imported later
-- `MetaAgents/n8n/credentials` is the optional drop-in directory for private credential JSON files if you later receive the private add-on package
-
-## 6. Pull the Ollama Models
-
-After the containers are up, run:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File MetaAgents/scripts/pull-ollama-models.ps1
+```mermaid
+flowchart TB
+    subgraph Automation[Workflow automation]
+        W[WhatsApp workflow]
+        M[Gmail workflow]
+        N[n8n]
+    end
+    subgraph Services[Application services]
+        F[FastAPI form-filler]
+        O[Ollama translation]
+        R[Report UI]
+    end
+    subgraph Data[Data layer]
+        P[(PostgreSQL)]
+        X[Excel templates and generated forms]
+    end
+    W --> N --> F
+    M --> N
+    F <--> P
+    F <--> X
+    F --> O
+    F --> R
 ```
 
-This script pulls the following three models:
+### Stack
 
-1. `kamekichi128/qwen3-4b-instruct-2507:latest`
-2. `qwen3:1.7b`
-3. `deepseek-r1:7b`
+`n8n` · `FastAPI` · `PostgreSQL` · `Docker Compose` · `Ollama` · `DeepSeek API` · `Cloudflare Tunnel` · `WhatsApp Cloud API` · `Gmail` · `Excel`
 
-Wait for the script to complete fully. Do not close the window halfway through.
+### Repository guide
 
-## 7. Check the Cloudflare Tunnel
+| Path | Purpose |
+|---|---|
+| `n8n/imports/` | WhatsApp and Gmail workflow definitions |
+| `form-filler/` | Form generation, reply synchronization, and reporting service |
+| `postgres/info_record.sql` | Initial record-table schema |
+| `docker-compose.yml` | Local service composition |
+| `n8n/credentials/credential-setup.md` | Credential-configuration guide |
+| `cloudflare-whatsapp-setup.md` | Cloudflare Tunnel and WhatsApp setup guide |
 
-Log in to the Cloudflare Dashboard and confirm that the Tunnel you plan to run contains at least these two public hostnames:
+### Quick start
 
-1. `n8n.metagents6.xyz` -> `http://n8n:5678`
-2. `reports.metagents6.xyz` -> `http://form-filler:8000`
+1. Create and populate `.env` with your own keys, database password, and domain.
+2. Initialize PostgreSQL and run `postgres/info_record.sql`.
+3. Start the services with `docker compose up -d --build`.
+4. Import `n8n/imports/v1.json` and `n8n/imports/gmail.json` into n8n.
+5. Create and bind the required WhatsApp, Gmail, Postgres, and Ollama credentials in n8n.
 
-If you are not using the default domain and want to use your own domain instead, update both of the following:
+For the full setup, see [`n8n/credentials/credential-setup.md`](n8n/credentials/credential-setup.md), [`cloudflare-whatsapp-setup.md`](cloudflare-whatsapp-setup.md), and [`form-filler/README.md`](form-filler/README.md).
 
-- `DOMAIN` in `MetaAgents/.env`
-- The matching public hostname in Cloudflare Tunnel
+## Security and privacy
 
-## 8. Open n8n for the First Time
+This public repository intentionally does not contain secrets, OAuth tokens, real passwords, or private credential exports. Use a separate `.env` file and your own service credentials. Review the repository setup documents before exposing any tunnel, webhook, or report interface.
 
-Open this URL in a browser:
+## License
 
-```text
-https://n8n.metagents6.xyz
-```
-
-If you changed `DOMAIN` in `MetaAgents/.env`, open the new domain instead.
-
-On first launch, follow the on-screen prompts to complete owner initialization. You can use your own email address, name, and login password for this local machine.
-
-## 9. Prepare the 5 Credentials in n8n First
-
-The public package does not include real credentials. Open `MetaAgents/n8n/credentials/credential-setup.md` and create the following five credentials:
-
-1. `WhatsApp OAuth account`
-2. `WhatsApp account`
-3. `Gmail account`
-4. `Postgres account`
-5. `Ollama account`
-
-Two important notes:
-
-- Keep the credential names exactly the same whenever possible.
-- If you already received the private add-on package, first follow the README inside that package and place the five credential JSON files into `MetaAgents/n8n/credentials`, so the next script can try to import them directly.
-
-## 10. Import the Workflows
-
-Run:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File MetaAgents/scripts/import-n8n-assets.ps1
-```
-
-This script behaves as follows:
-
-- `MetaAgents/n8n/imports/v1.json` and `MetaAgents/n8n/imports/gmail.json` will always be imported
-- If real credential `*.json` files from the private add-on package have already been placed into `MetaAgents/n8n/credentials`, the script will copy them into the n8n container temporarily and try to import those credentials
-- If `MetaAgents/n8n/credentials` only contains the public Markdown files and no real credential `*.json` files, the script will skip credential import and tell you to continue with manually created credentials
-
-## 11. Verify the Import Manually
-
-Open n8n and confirm that these two workflows now exist:
-
-1. `v1`
-2. `gmail`
-
-Open both workflows and check whether any red missing-credential warnings remain.
-
-If you created the credentials manually and the workflow still shows missing credentials, re-select the matching credential inside the affected node.
-
-## 12. Change the Recipient Email If Needed
-
-The default recipient email in the two workflows is still `DSC2409007@xmu.edu.my`.
-
-If you want to change it to your own email address, modify only the `sendTo` field in these two nodes:
-
-1. `Send a message` in the `v1` workflow
-2. `Send a message` in the `gmail` workflow
-
-Do not change any other field in those nodes.
-
-## 13. Activate the Workflows
-
-Manually activate these two workflows:
-
-1. `v1`
-2. `gmail`
-
-Even if your main goal is the email loop, you still need to complete the next `v1` trigger first, because `v1` is what automatically generates the source table and the first Excel file. Before starting, also make sure you have opened and checked both workflows at least once and confirmed that all credentials are connected.
-
-## 14. Let `v1` Generate the Source Table and First Excel File First
-
-Do not manually create a fixed `n8n_info_record_...` table anymore. The first time `v1` receives a WhatsApp message, it automatically creates a source table in the format `n8n_info_record_<current_phone_number>` and generates the `.xlsx` file that the `gmail` workflow will later use.
-
-### 14.1 Do One Minimal `v1` Test First
-
-Using the phone number that matches the current WhatsApp Cloud API configuration, send one new WhatsApp message to the business number.
-
-Expected results:
-
-1. `v1` is triggered successfully
-2. A new source table named `n8n_info_record_<phone_number>` appears in the database automatically
-3. You receive one email sent by `v1` with a newly generated `.xlsx` attachment
-4. That generated file will also usually appear in `MetaAgents/generated_forms`
-5. Opening `v1` shows no missing-credential warnings
-
-If you want to confirm that the source table was created, run:
-
-```sql
-SELECT table_name
-FROM information_schema.tables
-WHERE table_schema = 'public'
-  AND table_name LIKE 'n8n_info_record_%'
-ORDER BY table_name;
-```
-
-### 14.2 Record the Actual Table Name You Will Use Later
-
-When testing `gmail` later, use the actual `.xlsx` attachment received in the previous step. Do not use any fixed sample file.
-
-The two safest ways to identify the correct table name are:
-
-1. Look at the attachment filename and remove `.xlsx`
-2. Check the newly created `n8n_info_record_%` table in PostgreSQL
-
-## 15. Test the `gmail` Workflow Afterwards
-
-The attachment used in the following steps is not a fixed sample from the public package. It is the actual `.xlsx` file generated and sent by `v1` in Step 14.
-
-### 15.1 Test the Non-`confirm` Branch
-
-Send one email to the monitored Gmail inbox:
-
-- Subject: anything except `confirm`
-- Attachment: the `.xlsx` file received in Step 14
-
-Expected results:
-
-1. `gmail` is triggered
-2. The workflow calls `form-filler` at `sync/maintenance-form/reply`
-3. You receive a reply email with a new workbook attachment
-
-### 15.2 Test the `confirm` Branch
-
-Send another email to the same monitored Gmail inbox:
-
-- Subject: `confirm` or `Confirm`
-- Attachment: the same `.xlsx` file received in Step 14
-
-Expected results:
-
-1. `gmail` is triggered
-2. The data from the source table that matches the attachment filename is written into `info_record`
-3. That source table is deleted
-
-You can verify this with the following SQL:
-
-```sql
-SELECT * FROM info_record ORDER BY id DESC;
-```
-
-Replace `<ACTUAL_TABLE_NAME_FROM_ATTACHMENT>` below with the actual attachment filename from Step 14, without `.xlsx`:
-
-```sql
-SELECT table_name
-FROM information_schema.tables
-WHERE table_schema = 'public'
-  AND table_name = '<ACTUAL_TABLE_NAME_FROM_ATTACHMENT>';
-```
-
-## 16. Troubleshooting Order
-
-1. Re-check whether `MetaAgents/.env` has been filled in correctly for the actual machine
-2. Re-check whether `MetaAgents/postgres/info_record.sql` has already been executed
-3. Re-check that you already sent at least one WhatsApp message first and that `v1` has already generated both the `n8n_info_record_<phone_number>` source table and the first `.xlsx`
-4. Re-run `MetaAgents/scripts/pull-ollama-models.ps1`
-5. Open `MetaAgents/n8n/credentials/credential-setup.md` and confirm that the five credentials were filled in correctly
-6. Open `MetaAgents/n8n/credentials/README.md` and confirm that any private credential files were copied into the correct directory
-7. Re-run `MetaAgents/scripts/import-n8n-assets.ps1`
-8. If the setup still feels too costly to do manually, contact `DSC2409007@xmu.edu.my` to request the private add-on package
-
-## 17. Run the Integrity Check One More Time at the End
-
-After everything is complete, run:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File MetaAgents/scripts/check-metaagents.ps1
-```
-
-If the script passes, it means the required files in the public delivery package are present and the public area does not contain any obvious real sensitive values.
+See [LICENSE](LICENSE) for licensing information.
